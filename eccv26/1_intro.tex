@@ -1,0 +1,145 @@
+\section{Introduction}
+
+% === P1: Task importance (brief) ===
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{imgs/title_vs.pdf}
+  \caption{asdasdasdasd
+}
+  \label{fig:title}
+\end{figure*}
+Visual object tracking is a fundamental task in computer vision with
+broad applications in autonomous driving~\cite{autonomous},
+surveillance~\cite{surveillance}, augmented reality~\cite{AR},
+and robotics~\cite{robotics}.
+Given the target location in an initial frame, the goal is to estimate
+its trajectory throughout a video sequence — a task made challenging
+by occlusions, background clutter, illumination changes,
+and appearance variations.
+
+% === P2: Transformer trackers are great but costly ===
+Recent one-stream Transformer-based trackers~\cite{ostrack,artrack}
+have achieved remarkable accuracy by jointly modeling template–search
+interactions through self-attention.
+However, their quadratic attention complexity over long token sequences
+incurs substantial computational cost, hindering deployment on
+resource-constrained platforms such as UAVs and mobile robots.
+The field has pursued two lines of work to improve efficiency:
+lightweight architectures~\cite{HiT,lighttrack,fear} that employ
+scaled-down backbones at the expense of discriminative power,
+and adaptive computation methods~\cite{AVTrack,wu2024learning,abavitrack}
+that reduce average latency but leave the worst-case computational
+cost largely unchanged.
+
+% === P3: ViT enables sparsification → existing tracking works ===
+Unlike CNNs that operate on dense feature maps, Vision Transformers
+represent images as discrete token sequences, naturally enabling
+dynamic token reduction — a strategy proven effective in general
+vision tasks~\cite{evit,bolya2022tome}.
+This makes token sparsification a particularly promising avenue for
+accelerating Transformer-based trackers.
+Several recent works have explored this direction:
+OSTrack~\cite{ostrack} repurposes the cross-attention scores between
+search and template tokens as a pruning criterion, retaining a fixed
+ratio of search tokens at intermediate encoder layers;
+FARTrack~\cite{wang2026fartrack} extends this by additionally leveraging
+attention to learnable location tokens;
+AVTrack~\cite{AVTrack} trains an auxiliary sub-network to predict
+per-token importance for early dropping decisions.
+
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{imgs/motivation.pdf}
+  \caption{\textbf{Why early-stage token pruning fails.}
+  (a)~Attention map visualization across encoder layers on three tracking sequences.
+  Early layers produce diffuse, noisy attention that has not yet localized the target,
+  explaining why existing methods conservatively defer token pruning to intermediate layers.
+  (b)~Effect of performing one-shot token reduction (33\% retention align to OSTrack\cite{ostrack}) at different
+  encoder layers on GOT-10k \textit{val}.
+  Without spatial guidance (\textit{w/o\,G.T.}), accuracy drops sharply as pruning
+  moves to earlier layers.
+  With ground-truth target locations guiding selection (\textit{w/\,G.T.}),
+  accuracy remains nearly flat across all layers while GMACs decrease
+  substantially with earlier pruning.
+}
+  \label{fig:motivation}
+\end{figure*}
+
+% === P4: Limitations + left figure ===
+Despite these advances, existing token sparsification approaches for
+tracking still face systematic limitations. On the token-reduction side,
+pruning is typically applied too late: as illustrated in~\figref{fig:motivation}(a),
+early-layer attention maps are highly diffuse, making attention-based
+importance scores unreliable and forcing most methods to defer pruning
+to intermediate layers (e.g., progressively at the 4rd, 7th, 11th),
+leaving the computationally expensive early layers to process the full
+token set. Moreover, common pruning criteria (cross-attention scores or
+auxiliary predictors) capture only appearance-level relevance within the
+current frame and ignore the strong temporal motion continuity in
+tracking, i.e., the prior knowledge of where the target was in the
+previous frame. On the output side, the prediction
+head remains a dense bottleneck: convolutional heads assume a dense,
+spatially structured token grid, so aggressive sparsification requires
+padding and reshaping sparse tokens back to a full 2D feature map,
+wasting computation on empty positions; at high compression ratios, the
+target-center token may even be pruned, leading to severe
+mislocalization. This mismatch between a sparse backbone and a dense
+head caps the achievable speedup and degrades accuracy. Notably, the
+decoding head is not necessarily convolutional in modern trackers: some
+methods decode targets via additional learnable tokens (e.g.,
+MixFormerV2~\cite{mixformerv2} and the ARTrack series~\cite{artrack,wang2026fartrack}),
+and LoRAT~\cite{lin2024loratrack} replaces the convolutional head
+with MLPs. However, these predictor designs are typically developed
+under dense token/feature assumptions, and their behavior under
+aggressive token sparsification remains under-explored.
+
+% === P5: Key insight + right figure (the pivot paragraph) ===
+A natural question arises: is early-layer pruning inherently
+harmful, or does it merely lack the right guidance?
+To answer this, we conduct a diagnostic experiment that disentangles
+the effect of when to prune from what to prune.
+As shown in~\figref{fig:motivation}(b), when token selection at
+33\% retention is guided by ground-truth target locations, accuracy
+remains remarkably stable regardless of the pruning layer, while computational cost (GMACs) decrease substantially with earlier pruning.
+In contrast, without such guidance, accuracy degrades sharply as
+pruning moves to earlier layers.
+This result indicates that the performance degradation associated with
+early pruning stems not from insufficient token representations, but
+from the inability to identify the correct tokens to retain at that
+stage.
+The challenge therefore reduces to two sub-problems:
+(i)~obtaining a reliable spatial prior for token selection
+before the encoder has produced discriminative features, and
+(ii)~designing a prediction head that natively operates on the
+resulting sparse, unstructured token set.
+
+% === P6: Our method ===
+In this work, we propose \textbf{MaST}
+(\textbf{M}otion-\textbf{a}ware \textbf{S}parse \textbf{T}racker),
+a sparse tracking framework that addresses these
+limitations with a cohesive design.
+%
+MaST performs early, task-driven token reduction in the search region by
+injecting a history-based motion prior into the selection process.
+To avoid a dense output bottleneck, MaST also introduces a natively
+\textbf{sparse prediction head} that operates directly on unstructured
+tokens with a score-first, regress-once design, eliminating dense
+reshape and reducing redundant computation.
+
+
+% === P8: Contributions ===
+Our main contributions are summarized as follows:
+\begin{itemize}
+  \item We propose MaST, a sparse tracking framework that performs early,
+        task-driven token reduction in the search region using temporal
+        motion priors.
+
+  \item We introduce a natively sparse prediction head with a
+        score-first, regress-once design that operates directly on
+        unstructured tokens, removing the dense head bottleneck.
+
+  \item Extensive experiments on LaSOT, GOT-10k, TrackingNet, UAV123,
+        and DTB70 demonstrate that MaST achieves competitive or superior
+        accuracy while significantly reducing computational cost.
+\end{itemize}

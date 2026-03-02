@@ -1,0 +1,22 @@
+\begin{table}[ht]
+    \centering
+    \caption{Results of scaling to a ViT-Base model and increasing input resolution. Accuracy (Acc) and FPS are reported.}
+    \resizebox{0.7\linewidth}{!}{
+        \begin{tabular}{c|c|c|cc|c}
+            \toprule
+            Model & Input                    & \%Tokens Retained & LaSOT & GOT-10k & FPS \\
+                  &                          &                   & AUC   & AO      & (GPU)   \\
+            \midrule[0.5pt]
+            \multirow{6}*{\shortstack{ViT-base}}
+                  & \multirow{2}*{\(224^2\)} & 100\%             & 71.3  & 71.9    & 116 \\
+                  &                          & 30\%              & 69.8  & 70.2    & 215 \\
+            \cline{2-6}
+                  & \multirow{4}*{\(378^2\)} & 100\%             & 72.1  & 73.3    & 51  \\
+                  &                          & 30\%              & 70.4  & 71.5    & 104 \\
+                  &                          & 20\%              & 68.9  & 70.6    & 119 \\
+                  &                          & 10\%              & 67.2  & 68.4    & 126 \\
+
+            \bottomrule
+        \end{tabular}}
+    \label{tab:scaling}
+\end{table}

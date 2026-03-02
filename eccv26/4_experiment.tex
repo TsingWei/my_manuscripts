@@ -1,0 +1,127 @@
+\section{Experiment}
+\label{Experiment}
+\input{tables/tab_allr}
+\input{tables/tab_more}
+
+    \textbf{Device.} 
+    Our MaST models are implemented using Python 3.10 and PyTorch 2.4.1. Training is conducted on a single NVIDIA RTX 3090 GPU with AMD EPYC 7532 CPU and 64GB memory. We evaluate inference speed on three representative edge platforms: Broadcom BCM2712 (Raspberry Pi 5), Intel N100, and NVIDIA Jetson Orin Nano. Unlike prior works that report PyTorch speed, which is decoupled from real-world deployment and fails to fully exploit hardware-level optimizations, we export ONNX files with OpSet 17 and benchmark with ONNXRuntime 1.20.1 to reflect practical on-device performance.
+
+
+\textbf{Model.} 
+To demonstrate our method on the low-cost edge device, we use ViT-Tiny~\cite{vit} as the encoder and the training are initialized with the MAE-lite~\cite{wang2023maelite}.  
+% We provide the 30\% tokens retraining model as MaST-tiny, and a lighter model that only using first 8 layers as MaST-nano, to show the compatibility of our method with layer pruning.  More results with various token retention rates can be seen in ablation studies.   
+
+
+
+
+
+\textbf{Training.} 
+The training splits of COCO~\cite{coco}, LaSOT~\cite{lasot}, GOT-10k~\cite{got10k} and TrackingNet~\cite{trackingnet} are used for training. Common data augmentations including horizontal flip and brightness jittering are used in training. The GPU holds 128 image pairs as the batch size. We train the model with AdamW optimizer~\cite{adamw}, set the weight decay to $10^{-4}$, the initial learning rate for the backbone to $4\times10^{-5}$ and other parameters to $4\times10^{-4}$, respectively. The total training epochs are set to 300 with 60k image pairs per epoch and we decrease the learning rate by a factor of 10 after 240 epochs.  The sparsification rate is gradually warmed-up during training following OSTrack~\cite{ostrack}.  More details of training and hyper-parameters can be found in the supplementary material.
+
+
+\subsection{Comparison with State-of-the-arts}
+We conduct a comprehensive comparison on five widely used tracking benchmarks. Trackers are grouped into three tiers---$\sim$500M, $\sim$1G, and $\sim$2G MACs---based on their computational cost, and compared within the same tier.
+
+\textbf{LaSOT.} LaSOT~\cite{lasot} is a large-scale long-term tracking benchmark comprising 1,400 video sequences with 280 sequences reserved for testing. As shown in~\tabref{tab-sota-efficient}, MaST-tiny achieves the highest AUC of 63.3 and $P_{Norm}$ of 72.2 in the $\sim$1G group, outperforming AsymTrack-S~\cite{zhu2025asymtrack} by +0.5 AUC and HiT-Small~\cite{HiT} by +2.8 AUC, while running at 22.6 FPS on Raspberry Pi 5. MaST-small further pushes to 65.8 AUC in the $\sim$2G group, surpassing FERMT~\cite{fermt} by +0.7 AUC.
+
+\textbf{TrackingNet.} TrackingNet~\cite{trackingnet} is a large-scale short-term benchmark with 511 test sequences covering diverse real-world scenarios. MaST-tiny leads the $\sim$1G group with 80.1 SUC and $P_{Norm}$ of 85.3, surpassing AsymTrack-S by +2.2 SUC. In the $\sim$2G group, MaST-small achieves 82.3 SUC, outperforming all competing methods in its tier.
+
+\textbf{GOT-10k.} GOT-10k~\cite{got10k} is a large-scale dataset with 180 test sequences featuring non-overlapping object categories between train and test splits, designed to measure generalization. MaST-tiny attains an AO of 66.6 and $\text{SR}_{0.75}$ of 62.5 in the $\sim$1G group, outperforming AsymTrack-S by +1.1 AO and +3.6 $\text{SR}_{0.75}$. MaST-small achieves the top AO of 70.0 and $\text{SR}_{0.75}$ of 67.0 in the $\sim$2G group.
+
+\textbf{UAV Benchmarks.} UAV123~\cite{uav123} and DTB70~\cite{dtb70} are aerial tracking datasets focusing on low-altitude scenarios with fast motion, small targets, and frequent occlusion. As reported in~\tabref{tab:uav-uav123} and~\tabref{tab:uav-dtb70}, MaST-tiny achieves 63.8 AUC on UAV123 and 63.3 AUC on DTB70, outperforming other lightweight trackers such as HiT-Tiny and FEAR-XS. MaST-nano achieves competitive results with 61.3 AUC on UAV123 and 61.8 AUC on DTB70, demonstrating its suitability for resource-constrained aerial tracking tasks.
+
+
+
+
+\subsection{Ablation Study}
+% For efficient experiments, We train our model on GOT-10k train split and test on val split for ablation studies as default setting.
+
+\textbf{Impact of Different Sparsification Strategies}
+\tabref{tab:sparse} compares the performance and efficiency of various sparsification strategies, all evaluated with the 1$\times$1 conv sparse prediction head. The plain method ("None" in the table) processes all tokens densely, resulting in the highest accuracy but also the largest computational cost. Reserving 30\% tokens at the \{\texttt{3-5-7}\} layers of encoder is directly from OSTrack~\cite{ostrack} as the baseline, which achieves a moderate reduction in FLOPs and a small drop in accuracy. When sparsification is applied only at the first attention layer ("Attention \texttt{\{1\}}@30\% "), computation is largely reduced but at the cost of a significant drop in accuracy.
+Incorporating the proposed Motion Window (MW) mechanism substantially improves the trade-off. With MW, both at 50\% and 30\% sparsity, our method achieves a much better balance, maintaining competitive accuracy while significantly reducing the encoder FLOPs and boosting FPS. 
+
+\input{tables/tab_token.tex}
+
+\textbf{Analysis of Different Prediction Heads.}
+\tabref{tab:head} compares the performance and efficiency of various prediction heads before and after backbone sparsification. Across all head types, applying backbone sparsification yields a substantial reduction in computational cost (FLOPs), with only marginal drops in tracking accuracy metrics. Notably, the 1×1 conv head achieves the best balance between accuracy and efficiency, maintaining competitive results while benefiting most from the reduced computation.  We hypothesize that head designs from MixFormerV2~\cite{mixformerv2}, which rely on a \texttt{cls} token mechanism similar to original ViT~\cite{vit}, are highly dependent on large model capacity to effectively aggregate information. In contrast, for lightweight models, positional priors become more critical for accurate target localization. 
+
+\begin{table}[ht]
+    \centering
+    \caption{Performance of different heads.  Values before the slash represent results with a dense backbone, and values after the slash represent results with a 30\% sparse backbone plus motion window.}
+    \resizebox{0.8\linewidth}{!}{
+        \begin{tabular}{l| ccc | c}
+            \toprule
+            \multirow{2}*{Head} & \multicolumn{3}{c|}{{LaSOT}} & \multirow{2}*{MACs} \\
+                                         & {AUC}                        & P$_{Norm}$                   & P  \\
+                                         
+            \midrule[0.5pt]
+            3$\times$3 Conv. \cite{ostrack}  & 65.0 / 63.6 & 74.3 / 72.8 & 68.9 / 66.8 & 2.39G / 1.463G\\ 
+            Location Tokens\cite{mixformerv2}     & 59.0 / 57.9 & 68.9 / 67.5 & 65.6 / 63.5 & 1.76G / 0.845G\\
+            Transformer Decoder & 61.4 / 60.1 & 71.4 / 69.9 & 66.9 / 64.6 & 1.88G / 0.833G\\
+            MLP  & 64.8 / 63.3 & 74.2 / 72.2 & 68.3 / 66.4 & 1.79G / 0.864G\\
+            \bottomrule
+        \end{tabular}}
+    \label{tab:head}
+\end{table}
+
+
+
+\begin{figure}[h]
+% \vskip 0.2in 
+\begin{center}
+\centerline{\includegraphics[width=0.9\columnwidth]{imgs/vs_window_plot.png}}
+\caption{AUC vs. FPS trade-off on LaSOT with different sparsification strategies. The orange and blue curves compare the performance of motion windows with 1×1 and 3×3 convolution heads, respectively, at various token retention rates. The dashed line represents results without motion windows.}
+
+\label{abl_vs}
+\end{center}
+% \vskip -0.2in
+\end{figure}
+
+
+\input{tables/tab_layer}
+\input{tables/tab_head}
+\begin{figure*}[htbp]
+    \vskip 0.2in
+    \begin{center}
+    \centerline{\includegraphics[width=0.9\textwidth]{imgs/window_vis_xs.png}}
+    % \vskip -0.4in
+    \caption{Visualization of the token sparsification process. The left panel shows baseline sparsification based on raw importance scores, resulting in scattered token retention. The right panel illustrates our motion-aware sparsification, where a motion window re-ranks importance scores based on previous predictions, producing more coherent retention patterns.}
+    \label{vis_window}
+    \end{center}
+    % \vskip -0.4in
+\end{figure*}
+
+
+\textbf{Analysis of Heads Under Various Sparse Rates.}
+\figref{abl_vs} also examines the impact of 1×1 and 3×3 convolution heads on the efficiency of the sparsification framework when motion windows are applied. The results clearly show that the 1×1 convolution head (orange solid line) achieves significantly higher FPS compared to the 3×3 convolution head (blue solid line) at all token retention rates, while maintaining comparable AUC performance. For example, at a 30\% token retention rate, the 1×1 head achieves around 20 FPS, whereas the 3×3 head only reaches approximately 13 FPS. This is due to the reduced computational complexity of 1×1 convolutions, which makes them more suitable for sparse scenarios with fewer tokens. These findings highlight the efficiency advantage of 1×1 convolutions in real-time tracking tasks under computational constraints. 
+
+
+\textbf{Layer-wise Sparsification Analysis.}
+\tabref{tab:layer} evaluates the effect of applying token sparsification at different layers (all with our motion sparsification) of the Transformer encoder. Sparsification at earlier layers achieves the best balance between performance and efficiency, with an AUC of 63.3, 24.6 FPS, and the lowest computational cost of 862M FLOPs at the first layer. As sparsification is delayed to later layers, the AUC slightly improves, but the running latency increases significantly. The results indicate that sparsification on early layer reaches the most efficient trade-off between accuracy and speed.
+
+
+
+\textbf{Visualization of the token sparsification process.}
+ The left panel of \figref{vis_window} shows baseline sparsification based on raw importance scores, resulting in scattered token retention. The right panel illustrates our motion-aware sparsification, where a motion window re-ranks importance scores based on previous predictions, producing more coherent retention patterns.
+
+% \subsection{Limitations.}
+% One limitation of our approach lies in the reduced "receptive field" compared to methods that perform dense computation over the entire local search region. By focusing on a smaller set of motion-guided tokens, the model may miss targets that move abruptly or unpredictably outside the attended area. This issue becomes more pronounced if the underlying model lacks sufficient accuracy, or if the input frame rate is too low—leading to poor motion continuity and large inter-frame displacements. In such scenarios, the tracker may fail to recover the target, resulting in decreased performance. Future work may explore adaptive mechanisms to dynamically adjust the search area or incorporate long-term cues to address these challenges.
+
+\textbf{Per-Attribute Analysis.}
+The radar chart in \figref{radar} shows that 30\% tokens with a motion window (blue) achieve performance close to 100\% tokens (red) across most attributes, especially in fast motion and occlusion scenarios. In contrast, 30\% tokens without a motion window (cyan) exhibit notable drops in attributes like out-of-view and background clutter. The decline in background clutter performance may stem from the model's insufficient discriminative capability, leading to the predicted bounding box drifting toward similar objects. When this inaccurate prediction is used to generate the motion window, it restricts the search area, further limiting the model's ability to recover the target in cluttered backgrounds. This shows the need for stronger discriminative features to complement sparsification strategies.
+
+ \begin{figure}[h]
+% \vskip -0.4in
+\begin{center}
+\centerline{\includegraphics[width=0.7\columnwidth]{imgs/radar_plot.png}}
+\caption{Per-attribute performance comparison using a radar chart. Results are shown for three setups: 100\% tokens, 30\% tokens with motion window, and 30\% tokens without motion window. The motion window significantly improves performance in challenging scenarios like fast motion, occlusion, and out-of-view cases.}
+\label{radar}
+\end{center}
+% \vskip -0.4in
+\end{figure}
+
+\textbf{Analysis of Motion Window.}
+\tabref{tab:windowing} presents an ablation study of various windowing strategies used in the proposed framework. We compare two window types (Gaussian and Cosine), evaluate the effect of incorporating cross-attention importance scores, and analyze whether dynamic window resizing (based on the width and height of the previous frame’s bounding box) improves performance. Results show that combining importance scores with a Gaussian window achieves the best overall performance. The fixed windowing approach yields sub-optimal performance compared to dynamic window sizes. The last two rows highlight that using only motion windows for sparsification performs better than using only cross-attention scores, but their combination consistently outperforms either individually. This confirms that both the spatial prior and cross-attention scores are crucial for effective token selection.
+% This conclusion is further supported by \figref{abl_vs}, where the orange solid line (Gaussian with motion windows) achieves superior AUC across different token retention rates compared to the dashed orange line (without motion windows). The motion window effectively enhances the selection of relevant tokens, particularly at lower retention rates (e.g., 30\% and 20\%), where its use maintains accuracy while achieving higher FPS. This demonstrates the importance of combi`ning spatial priors from motion windows with cross-attention scores to optimize tracking performance and efficiency.
+
+\input{tables/tab_window}

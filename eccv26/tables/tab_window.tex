@@ -1,0 +1,24 @@
+\begin{table}[ht]
+    \centering
+    \caption{Comparison of different windowing strategies on GOT-10k \texttt{val}. We evaluate the impact of window type (Gaussian or Cosine), the use of importance scores, and whether the window dynamically adapts to the previous frame’s bounding box size and aspect ratio.}
+    \resizebox{0.9\linewidth}{!}{
+        \begin{tabular}{c|c|c|ccc}
+            \toprule
+            {Window} & \multirow{2}{*}{\shortstack{Importance                                   \\Score}} & \multirow{2}{*}{Dynamic} & \multirow{2}{*}{AUC} & \multirow{2}{*}{P} & \multirow{2}{*}{P$_{Norm}$}\\
+            {Type}   &                                        &            &      &             \\
+            \midrule[0.5pt]
+            Gaussian & \checkmark                             & \checkmark & 79.9 & 71.7 & 91.5 \\
+            Gaussian & \checkmark                             & -          & 79.5 & 70.5 & 90.2 \\
+            Cosine   & \checkmark                             & \checkmark & 79.8 & 71.1 & 91.2 \\
+            Cosine   & \checkmark                             & -          & 79.1 & 70.2 & 89.9 \\
+            -        & \checkmark                             & -          & 76.9 & 68.2 & 86.5       \\
+            Gaussian & -                                      & \checkmark & 78.2 & 69.1 & 88.1      \\
+            % \hline
+            % Gaussian       & \checkmark                & 25\%                 & 68.2              & 75.4   \\
+            % Cosine         & \checkmark                & 25\%                 & 67.9              & 76.8   \\
+            % -           & \checkmark                & 25\%                 & 65.8              & 80.5   \\
+            % Gaussian       & -                & 25\%                 & 62.3              & 82.9   \\ 
+            \bottomrule
+        \end{tabular}}
+    \label{tab:windowing}
+\end{table}

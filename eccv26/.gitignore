@@ -1,0 +1,70 @@
+# LaTeX 编译产生的中间文件
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.synctex(busy)
+*.toc
+*.lof
+*.lot
+*.idx
+*.ind
+*.ilg
+*.glo
+*.gls
+*.glg
+*.acn
+*.acr
+*.alg
+*.ist
+*.nlo
+*.nls
+*.brf
+*.lol
+*.xdv
+*.bcf
+*.run.xml
+*.nav
+*.snm
+*.vrb
+*.dvi
+
+# 编译输出的 PDF（如需追踪 PDF 请删除此行）
+*.pdf
+
+# latexmk 目录
+.latexmk_cache/
+latexmk/
+
+# TeXstudio / TeXworks 项目文件
+*.txss
+*.txss2
+*.texlipse
+
+# Overleaf 同步文件
+.overleaf/
+
+# macOS 系统文件
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python 脚本产生的缓存（tables/ 下有 .py 脚本）
+__pycache__/
+*.py[cod]
+*.pyo
+
+# 虚拟环境
+.venv/
+venv/
+
+# 编辑器 / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

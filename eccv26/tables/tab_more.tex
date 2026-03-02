@@ -1,0 +1,35 @@
+\begin{table}[h]
+  \centering
+  \caption{State-of-the-art comparisons on more benchmarks.}
+  \label{tab:more-benchmarks}
+  \resizebox{0.5\linewidth}{!}{
+    \small
+    \begin{tabular}{l | r r | c c c}
+      \toprule
+      \multirow{2}*{Method} & GPU & CPU & LaSOText & VAST-T & NFS \\
+                            & FPS & FPS & AUC(\%)  & AUC(\%) & AUC(\%) \\
+      \midrule[0.5pt]
+        LightTrack~\cite{lighttrack}              & 125 & 14 & -    & - & 55.3 \\
+        FEAR-XS~\cite{fear}                       & 146 & 22 & -    & - & 61.4 \\
+        E.T.Track~\cite{ETTrack}                  & -   & -  & -    & - & 59.0 \\
+        % HiT-Tiny~\cite{HiT}                       & 118 & 28 & 35.8 & - & 53.2 \\
+        % HiT-Small~\cite{HiT}                      & 106 & 23 & 40.4 & - & 61.8 \\
+        HiT-Base~\cite{HiT}                       &  84 & 14 & 44.0 & - & 64.2 \\
+        MixformerV2-S~\cite{HiT}                      & - & 23 & 43.6 & - & 65.8 \\
+        LiteTrack-B4~\cite{LiteTrack}                   &  - & 12 & 41.8 & - & 66.4 \\
+        CompressTracker-2\cite{compressTracker}         &  - & - & 40.4 & - & - \\
+        % FARTrack$_\text{pico}$~\cite{wang2026fartrack} & - & - & 41.8 & - & 62.0 \\
+        % FARTrack$_\text{nano}$~\cite{wang2026fartrack} & - & - & 43.8 & - & \ranksecond{65.1} \\
+        FARTrack$_\text{tiny}$~\cite{wang2026fartrack} & - & - & \rankfirst{45.0} & - & \rankfirst{66.9} \\
+        % AsymTrack-T~\cite{zhu2025asymtrack}        &  99 & 21 & 42.5 & - & 63.3 \\
+        % AsymTrack-S~\cite{zhu2025asymtrack}        &  88 & 11 & 43.3 & - & 64.9 \\
+        AsymTrack-B~\cite{zhu2025asymtrack}        &  57 & 10 & \ranksecond{44.6} & - & 64.4 \\
+      \midrule[0.5pt]
+      \rowcolor[gray]{0.92} \multicolumn{6}{l}{\footnotesize\itshape Ours} \\
+        \textbf{MaST-nano}                         & \textbf{230} & \textbf{40} & - & - & - \\
+        \textbf{MaST-tiny}                         & \textbf{152} & \textbf{30} & - & - & - \\
+        \textbf{MaST-small}                        & \textbf{84}  & \textbf{14} & - & - & - \\
+      \bottomrule
+    \end{tabular}
+  }
+\end{table}
