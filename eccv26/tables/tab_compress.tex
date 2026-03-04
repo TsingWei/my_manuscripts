@@ -1,0 +1,18 @@
+\begin{table}[ht]
+    \centering
+    \caption{Comparison with alternative model compression strategies under the same computational budget ($\approx$820--870M MACs, ViT-Tiny backbone, LaSOT). ``$\downarrow$ Resolution'' reduces the search image size; ``Layer Pruning'' removes the last $N$ Transformer layers; our method applies motion-aware token sparsification at Layer~1 with 30\% retention. \textbf{Bold}: best result.}
+    \resizebox{0.8\linewidth}{!}{
+        \begin{tabular}{l | c | c c c | c}
+            \toprule
+            Method & MACs (M) & AUC $\uparrow$ & P$_{Norm}$ $\uparrow$ & P $\uparrow$ & FPS $\uparrow$ \\
+            \midrule
+            Full model (baseline)                       & 1752 & 64.3 & 74.2 & 68.3 & 23.2 \\
+            \midrule
+            $\downarrow$ Resolution ($224\to160$ px)    & 856  & 60.1 & 70.3 & 63.9 & 38.4 \\
+            $\downarrow$ Layer (ViT-tiny-4)                 & 864  & 61.8 & 71.6 & 65.4 & 34.1 \\
+            \rowcolor{gray!15}
+            \textbf{Token Sparsification (Ours)}        & \textbf{824}  & \textbf{63.8} & \textbf{73.6} & \textbf{67.9} & \textbf{48.3} \\
+            \bottomrule
+        \end{tabular}}
+    \label{tab:compress}
+\end{table}

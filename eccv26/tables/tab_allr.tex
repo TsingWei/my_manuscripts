@@ -1,11 +1,12 @@
 \begin{table*}[h]
   \centering
-  \vskip 0.1in
-  \caption{State-of-the-art comparisons of efficient tracking on three large-scale benchmarks. }
+  % \vskip 0.1in
+  \caption{State-of-the-art comparisons of efficient tracking on three large-scale benchmarks, grouped by computational cost. }
   \label{tab-sota-efficient}
-  \resizebox{0.995\linewidth}{!}{
+  \resizebox{0.998\linewidth}{!}{
     % \setlength{\tabcolsep}{2mm}{  
-    \small
+    % \small
+    \renewcommand{\arraystretch}{1.2}
      \begin{tabular}{c l| c|ccc c ccc c ccc |c ccc}
       \toprule
        & \multirow{2}*{Method}                           & \multirow{2}*{Pub.}  & \multicolumn{3}{c}{LaSOT} &            & \multicolumn{3}{c}{TrackingNet} &  & \multicolumn{3}{c|}{GOT-10k} & MACs       & \multicolumn{3}{c}{FPS}                                                            \\
@@ -13,31 +14,31 @@
        &                                                 &                      & AUC                       & P$_{Norm}$ & P                               &  & SUC                         & P$_{Norm}$ & P                       &  & AO   & SR$_{0.5}$ & SR$_{0.75}$ & (G)   & RPi5 & N100 & Nano \\
       
       \midrule[0.5pt]
-             & KCF~\cite{KCF}                                   & TPAMI'14     & 21.1          & 22.8          & 18.4          &  & -             & -             & -             &  & 27.9          & 26.3          & 9.9           & -     & {65.3} & {155} & - \\
-\midrule[0.1pt]
+             & KCF~\cite{KCF}                                   & TPAMI'14     & 21.1          & 22.8          & 18.4          &  & -             & -             & -             &  & 27.9          & 26.3          & 9.9           & -     & {65.3} & {275} & 203\footnotemark \\
+% \midrule[0.1pt]
       \rowcolor[gray]{0.92} \multicolumn{18}{l}{\footnotesize\itshape $\sim$500M MACs} \\
-        & MaST-nano                                   & Ours           & \ranksecond{58.6}          & \ranksecond{67.7}          & \ranksecond{59.4}          &  & \rankfirst{77.2}          & \rankfirst{82.5}          & \rankfirst{72.4}          &  & 61.6          & \ranksecond{71.8}          & \ranksecond{53.7}          & 0.585 & {30.1}          & {64.5}         & {230} \\
-        & AsymTrack-T~\cite{zhu2025asymtrack}              & AAAI'25      & \rankfirst{60.8}          & \rankfirst{68.7}          & \rankfirst{61.2}          &  & \ranksecond{76.2}          & \ranksecond{80.9}          & \ranksecond{71.6}          &  & \rankfirst{62.3}          & 71.3          & \rankfirst{54.7}          & 0.708   & -             & -            & {99} \\
+        & \textbf{MaST-nano}                                   & Ours           & \ranksecond{58.6}          & \ranksecond{67.7}          & \ranksecond{59.4}          &  & \rankfirst{77.2}          & \rankfirst{82.5}          & \rankfirst{72.4}          &  & 61.6          & \ranksecond{71.8}          & \ranksecond{53.7}          & 0.585 & {30.1}          & {64.5}         & {230} \\
+        & AsymTrack-T~\cite{zhu2025asymtrack}              & AAAI'25      & \rankfirst{60.8}          & \rankfirst{68.7}          & \rankfirst{61.2}          &  & \ranksecond{76.2}          & \ranksecond{80.9}          & \ranksecond{71.6}          &  & \rankfirst{62.3}          & 71.3          & \rankfirst{54.7}          & 0.708   & 18.1             & -            & {99} \\
         & FEAR-XS~\cite{fear}                              & ECCV'22      & 53.5          & -             & 54.5          &  & -             & -             & -             &  & \ranksecond{61.9}          & \rankfirst{72.2}          & -             & 0.532 & {19.5}          & {89.1}         & {146} \\
-        & LightTrack~\cite{lighttrack}                     & CVPR'21      & 53.8          & -             & 53.7          &  & 72.5          & 77.8          & 69.5          &  & 61.1          & 71.0          & -             & 0.483 & 13.4          & 60.2         & - \\
-      \midrule[0.1pt]
+        & LightTrack~\cite{lighttrack}                     & CVPR'21      & 53.8          & -             & 53.7          &  & 72.5          & 77.8          & 69.5          &  & 61.1          & 71.0          & -             & 0.483 & 13.4          & 60.2         & 124\\
+      % \midrule[0.1pt]
       \rowcolor[gray]{0.92} \multicolumn{18}{l}{\footnotesize\itshape $\sim$1G MACs} \\
-        & MaST-tiny                                  & Ours           & \rankfirst{63.3} & \rankfirst{72.2} & \rankfirst{66.4} &  & \rankfirst{80.1} & \rankfirst{85.3} & \rankfirst{77.2} &  & \rankfirst{66.6} & \rankfirst{76.0} & \rankfirst{62.5} & 0.836 & {22.6}          & {48.3}         & {152} \\
+        & \textbf{MaST-tiny}                                  & Ours           & \rankfirst{63.3} & \rankfirst{72.2} & \rankfirst{66.4} &  & \rankfirst{80.1} & \rankfirst{85.3} & \rankfirst{77.2} &  & \rankfirst{66.6} & \rankfirst{76.0} & \rankfirst{62.5} & 0.836 & {22.6}          & {48.3}         & {152} \\
         % & HKDT~\cite{Song2026HKDT}                         & TCSVT'26     & \rankfirst{63.8}          & \rankfirst{73.0}          & \rankfirst{67.5}          &  & \ranksecond{80.0}          & \ranksecond{85.1}          & \ranksecond{77.0}          &  & \rankfirst{67.6}          & \rankfirst{77.4}          & \ranksecond{60.8}          & 1.54  & -             & -            \\
         & FARTrack$_\text{pico}$~\cite{wang2026fartrack}   & ICLR'26      & 58.6          & 67.1          & 59.6          &  & 75.6          & 81.3          & 70.5          &  & 62.8          & 72.6          & 50.9          & 1.08  & -             & -            & - \\
-        & AsymTrack-S~\cite{zhu2025asymtrack}              & AAAI'25      & \ranksecond{62.8}          & \ranksecond{71.2}          & \ranksecond{64.8}          &  & \ranksecond{77.9}          & \ranksecond{82.2}          & \ranksecond{74.0}          &  & \ranksecond{65.5}          & \ranksecond{74.8}          & \ranksecond{58.9}          & 0.806   & -             & -            & {88} \\
+        & AsymTrack-S~\cite{zhu2025asymtrack}              & AAAI'25      & \ranksecond{62.8}          & \ranksecond{71.2}          & \ranksecond{64.8}          &  & \ranksecond{77.9}          & \ranksecond{82.2}          & \ranksecond{74.0}          &  & \ranksecond{65.5}          & \ranksecond{74.8}          & \ranksecond{58.9}          & 0.806   & 15.6             & -            & {88} \\
+        & ORTrack-D~\cite{wu2025ortrack}                   & CVPR'25      & 54.6          & 62.6          & 54.3          &  & 73.7          & 79.1          & 68.2          &  & -             & -             & -             & 1.54   & 18.5             & -             & 138 \\
         & HiT-Small~\cite{HiT}                             & ICCV'23      & 60.5          & 68.3          & 61.5          &  & 77.7          & 81.9          & 73.1          &  & 62.6          & 71.2          & 54.4          & 1.13  & 21.5          & 43.5         & {106} \\
         & HiT-Tiny~\cite{HiT}                              & ICCV'23      & 54.8          & 60.5          & 52.9          &  & 74.6          & 78.1          & 68.8          &  & 52.6          & 59.3          & 42.7          & 0.995 & {27.3}          & {53.3}         & {118} \\
-        & ORTrack-D~\cite{wu2025ortrack}                   & CVPR'25      & 54.6          & 62.6          & 54.3          &  & 73.7          & 79.1          & 68.2          &  & -             & -             & -             & 1.54   & -             & -             & 138 \\
         & E.T.Track~\cite{ETTrack}                         & WACV'23      & 59.1          & -             & -             &  & 75.0          & 80.3          & 70.6          &  & -             & -             & -             & 1.56  & 8.8           & 21.1         & - \\
-      \midrule[0.1pt]
+      % \midrule[0.1pt]
       \rowcolor[gray]{0.92} \multicolumn{18}{l}{\footnotesize\itshape $\sim$2G MACs} \\
-        & MaST-small                               & Ours          & \rankfirst{65.8}          & \ranksecond{74.5}          & \rankfirst{70.4}          &  & \rankfirst{82.3}            &   \rankfirst{87.1}          & \rankfirst{80.5}             &  & \ranksecond{70.0}          & 80.4          & \rankfirst{67.0}          & 1.82  & 14.3             & -            & {98} \\       
+        & \textbf{MaST-small}                               & Ours          & \rankfirst{65.8}          & \ranksecond{74.5}          & \rankfirst{70.4}          &  & \rankfirst{82.3}            &   \rankfirst{87.1}          & \rankfirst{80.5}             &  & \ranksecond{70.0}          & 80.4          & \rankfirst{67.0}          & 1.82  & 7.5             & -            & {98} \\       
         & FARTrack$_\text{nano}$~\cite{wang2026fartrack}   & ICLR'26      & 61.3          & 69.7          & 64.1          &  & 79.1          & 84.5          & 75.6          &  & 69.9          & \rankfirst{81.2}          & 61.4          & 1.78  & -             & -            & - \\
         & FARTrack$_\text{tiny}$~\cite{wang2026fartrack}   & ICLR'26      & 63.2          & 71.6          & 66.7          &  & 80.7          & \ranksecond{85.6}          & 77.5          &  & \rankfirst{70.6}          & \ranksecond{81.0}          & \ranksecond{63.8}          & 2.65  & -             & -            & - \\
+        & AsymTrack-B~\cite{zhu2025asymtrack}              & AAAI'25      & 64.7          & 73.0          & 67.8          &  & 80.0          & 84.5          & 77.4          &  & 67.7          & 76.6          & 61.4          & 1.81   & 6.2             & -            & {57} \\
         & FERMT~\cite{fermt}                               & ECCV'24      & \ranksecond{65.1}          & \rankfirst{74.6}          & \ranksecond{69.1}          &  & \ranksecond{80.8}          & 80.9          & \ranksecond{78.1}          &  & 69.6          & 80.1          & 63.2          & 2.31  & {7.9}           & {17.7}         & {84} \\
-        & AsymTrack-B~\cite{zhu2025asymtrack}              & AAAI'25      & 64.7          & 73.0          & 67.8          &  & 80.0          & 84.5          & 77.4          &  & 67.7          & 76.6          & 61.4          & 1.81   & -             & -            & {57} \\
-        & AVTrack~\cite{AVTrack}                           & ICML'24      & 64.1          & 73.2          & 68.0          &  & 80.1          & 84.6          & 78.0          &  & 67.5          & 77.6          & 62.4          & 2.39  & {7.7}           & {17.3}         & - \\
+        % & AVTrack~\cite{AVTrack}                           & ICML'24      & 64.1          & 73.2          & 68.0          &  & 80.1          & 84.6          & 78.0          &  & 67.5          & 77.6          & 62.4          & 2.39  & {7.7}           & {17.3}         & - \\
       % \midrule[0.1pt]
       % \rowcolor[gray]{0.92} \multicolumn{16}{l}{\footnotesize\itshape $>$2G MACs} \\
       %  & ECO~\cite{ECO}                                   & 32.4          & 33.8          & 30.1          &  & 55.4          & 61.8          & 49.2          &  & 31.6          & 30.9          & 11.1          & -     & 5.9           & 13.3         \\
@@ -48,5 +49,8 @@
       %  & LiteTrack-B4~\cite{LiteTrack}                   & 62.5          & 72.1          & 65.7          &  & 79.9          & 84.9          & 76.6          &  & 65.2          & 74.7          & 57.5          & 8.48  & 3.6           & 9.4          \\
       \bottomrule
     \end{tabular}
+   
   }
+  
 \end{table*}
+\footnotetext{KCF is tested on the CPU of Jetson Orin Nano with 256 input size.}

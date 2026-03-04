@@ -1,16 +1,21 @@
-\begin{table}[ht]
+\begin{wraptable}{r}{0.4\textwidth}
     \centering
-    \caption{Performance of sparsification operation applied at various Transformer layers. }
-    \resizebox{0.5\linewidth}{!}{
-        \begin{tabular}{c|cccccc}
+    \vspace{-1em}
+    \caption{Effect of sparsification layer on tracking accuracy and efficiency.}
+    \resizebox{\linewidth}{!}{
+        \begin{tabular}{c | c c c}
             \toprule
-            {\ding{36} Layer} & 1    & 2    & 3    & 4    & 5    & 6    \\
-            \midrule[0.5pt]
-            AUC               & 63.8 & 63.8 & 63.6 & 63.9 & 64.2 & 64.1 \\
-            FPS               & 24.6 & 19.6 & 17.0 & 15.1 & 13.8 & 12.5 \\
-            FLOPs(M)          & 862  & 942  & 1004 & 1080 & 1154 & 1238 \\
-
+            \shortstack{Sparsify \\ at Layer} & AUC & FPS & FLOPs (M) \\
+            \midrule
+            \rowcolor{gray!15}
+            \textbf{1} & {63.3} & \textbf{22.6} & \textbf{862}  \\
+            2          & 63.4          & 17.6          & 942           \\
+            3          & 63.4          & 14.0          & 1004          \\
+            4          & 63.6          & 12.1          & 1080          \\
+            5          & 63.8          & 11.3          & 1154          \\
+            6          & 63.7          & 10.1          & 1238          \\
             \bottomrule
         \end{tabular}}
     \label{tab:layer}
-\end{table}
+    \vspace{-1em}
+\end{wraptable}

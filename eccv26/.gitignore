@@ -34,7 +34,7 @@
 *.dvi
 
 # 编译输出的 PDF（如需追踪 PDF 请删除此行）
-*.pdf
+main.pdf
 
 # latexmk 目录
 .latexmk_cache/

@@ -3,8 +3,7 @@
 % \section{Appendix / supplemental material}
 \section{Appendix}
 
-\subsection{Limitations.}
-One limitation of our approach lies in the reduced "receptive field" compared to methods that perform dense computation over the entire local search region. By focusing on a smaller set of motion-guided tokens, the model may miss targets that move abruptly or unpredictably outside the attended area. This issue becomes more pronounced if the underlying model lacks sufficient accuracy, or if the input frame rate is too low—leading to poor motion continuity and large inter-frame displacements. In such scenarios, the tracker may fail to recover the target, resulting in decreased performance. Future work may explore adaptive mechanisms to dynamically adjust the search area or incorporate long-term cues to address these challenges.
+
 
 \subsection{Per-Atrribute Analysis.}
 The radar chart in \figref{radar} shows that 30\% tokens with a motion window (blue) achieve performance close to 100\% tokens (red) across most attributes, especially in fast motion and occlusion scenarios. In contrast, 30\% tokens without a motion window (cyan) exhibit notable drops in attributes like out-of-view and background clutter. The decline in background clutter performance may stem from the model's insufficient discriminative capability, leading to the predicted bounding box drifting toward similar objects. When this inaccurate prediction is used to generate the motion window, it restricts the search area, further limiting the model's ability to recover the target in cluttered backgrounds. This shows the need for stronger discriminative features to complement sparsification strategies.
@@ -25,8 +24,8 @@ This conclusion is further supported by \figref{abl_vs}, where the orange solid 
 
 \input{tables/tab_window}
 
-\subsection{Scaling to Larger Models and Resolutions.}
-Experiments shown in ~\tabref{tab:scaling} examine the scalability of our motion-aware sparsification by applying it to a slightly larger ViT-Base model(LoRAT~\cite{lorat}) and increasing the input resolution from 256×256 to 384×384. This experiment demonstrates the generalizability of our approach to larger models and higher-resolution inputs.
+\subsection{Scaling to Larger Models}
+Experiments shown in ~\tabref{tab:scaling} examine the scalability of our motion-aware sparsification by applying it to a slightly larger ViT-Base model(LoRAT~\cite{lin2024loratrack}) and increasing the input resolution from 256×256 to 384×384. This experiment demonstrates the generalizability of our approach to larger models.
 
 \input{tables/tab_larger}
 
@@ -37,7 +36,7 @@ Our primary focus is on real-world deployment scenarios, particularly on edge de
 \begin{table}[ht]
     \centering
     \caption{Comparison of tracking speed (FPS) for different methods on various hardware platforms, including NVIDIA 2080Ti GPU, Intel i7-13700 CPU, intel N100, and Raspberry Pi 5 (RPi-5). LaSOT AUC is reported as a measure of accuracy.}
-    \resizebox{0.7\linewidth}{!}{
+    \resizebox{0.65\linewidth}{!}{
         \begin{tabular}{c|c|cccc}
             \toprule
             Method& LaSOT AUC& 2080Ti & i7-13700 & N100 & RPi-5 \\
@@ -81,5 +80,8 @@ AVTrack                         & 64.1  & 274    & 78       & 17.3 & 7.7       \
 \label{fig:vis2}
 \end{center}
 \end{figure}
+
+\subsection{Limitations.}
+One limitation of our approach lies in the reduced "receptive field" compared to methods that perform dense computation over the entire local search region. By focusing on a smaller set of motion-guided tokens, the model may miss targets that move abruptly or unpredictably outside the attended area. This issue becomes more pronounced if the underlying model lacks sufficient accuracy, or if the input frame rate is too low—leading to poor motion continuity and large inter-frame displacements. In such scenarios, the tracker may fail to recover the target, resulting in decreased performance. Future work may explore adaptive mechanisms to dynamically adjust the search area or incorporate long-term cues to address these challenges.
 
 \clearpage

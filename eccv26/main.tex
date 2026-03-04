@@ -5,7 +5,7 @@
  
 % TODO REVIEW: Insert your submission number below by replacing '*****'
 % TODO FINAL: Comment out the following line for the camera-ready version
-\usepackage[review,year=2026,ID=*****]{eccv}
+\usepackage[review,year=2026,ID=12428]{eccv}
 % TODO FINAL: Un-comment the following line for the camera-ready version
 %\usepackage{eccv}
 
@@ -24,6 +24,7 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{colortbl}
+\usepackage{wrapfig}
 
 % The "axessiblity" package can be found at: https://ctan.org/pkg/axessibility?lang=en
 \usepackage[accsupp]{axessibility}  % Improves PDF readability for those with disabilities.
@@ -111,8 +112,8 @@ Now we have reached the maximum length of an ECCV \ECCVyear{} submission (exclud
 References should start immediately after the main text, but can continue past p.\ 14 if needed. 
 \clearpage  % TODO FINAL: This \clearpage needs to be removed from both review and camera-ready versions.
 
-\section*{Acknowledgements}
-Please insert your acknowledgments here.
+% \section*{Acknowledgements}
+% Please insert your acknowledgments here.
 
 % ---- Bibliography ----
 %
@@ -121,4 +122,7 @@ Please insert your acknowledgments here.
 %
 \bibliographystyle{splncs04}
 \bibliography{main}
+
+\input{A_supplementary.tex}
+
 \end{document}

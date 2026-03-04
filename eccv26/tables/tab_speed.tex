@@ -1,0 +1,23 @@
+\begin{table}[ht]
+    \centering
+    \caption{Breakdown of head computation under 30\% sparse backbone (ViT-Tiny, RPi 5).
+    A \emph{dense-compatible} head (3$\times$3 conv) must reshape sparse tokens back to a full 2D feature map before computation, incurring additional overhead.
+    Our sparse MLP head operates directly on retained tokens, eliminating the reshape cost.}
+    \resizebox{0.88\linewidth}{!}{
+        \begin{tabular}{l | c c | c c | c}
+            \toprule
+            \multirow{2}{*}{Head} & \multicolumn{2}{c|}{Head MACs (M)} & \multicolumn{2}{c|}{FPS (RPi 5)} & \multirow{2}{*}{\shortstack{Head \\ Speedup}} \\
+                                  & Dense tokens & Sparse tokens         & Dense backbone & Sparse backbone  & \\
+            \midrule
+            3$\times$3 Conv~\cite{ostrack}  & 640 & 640$^\dagger$ & --   & --   & $1.0\times$ \\
+            Loc Tokens~\cite{mixformerv2}   & 128 & 128$^\dagger$ & --   & --   & $1.0\times$ \\
+            Trans. Decoder                  & 256 & 256$^\dagger$ & --   & --   & $1.0\times$ \\
+            MLP (Dense)                             & 112 & 34            & --   & --   & $3.3\times$ \\
+            \rowcolor{gray!15}
+            {MLP (Sparse)} & \textbf{97} & \textbf{29} & \textbf{23.2} & \textbf{48.3} & $\mathbf{3.4\times}$ \\
+            \bottomrule
+        \end{tabular}}
+    \vspace{1pt}
+    % \footnotesize{$^\dagger$ Dense-compatible heads cannot reduce head MACs after sparsification because they require a full spatial grid.}
+    \label{tab:speed}
+\end{table}

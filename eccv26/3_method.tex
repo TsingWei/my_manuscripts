@@ -46,11 +46,11 @@ The Motion Window assigns higher weights to tokens closer to the previous predic
 where $(u_i, v_i)$ is the spatial location of the $i$-th token. This combined score $\mathbf{w}_i$ ensures that tokens within the likely target region (as constrained by the Motion Window) are prioritized, even if their raw attention scores are diffuse. Then we only keep the top-$K$ tokens $\mathcal{L}_K\in\mathbb{R} ^{N_K\times d}$ as the output of Motion-Aware Token Sparsification block, attached by the standard Transformer blocks in the encoder.
 
 
-\subsection{Fully Sparse Head and Loss}
+\subsection{Fully Sparse Prediction Head}
 Our goal is to avoid the dense-head bottleneck when the backbone operates on a sparsified, unstructured token set. Let the retained search tokens be
 \(\mathcal{L}_K = \{\mathbf{f}_k\}_{k=1}^{N_K}\), where $N_K\ll H_xW_x/P^2$ and each token keeps its original 2D location on the patch grid, denoted as $\mathbf{p}_k=(u_k,v_k)$.
 We design a natively sparse head that directly consumes $\mathcal{L}_K$ without padding or reshaping back to a dense feature map.
-We parameterize both branches with lightweight MLPs, similar to prior MLP-based heads (e.g., LoRATrack~\cite{lin2024loratrack}). We further tailor the head for sparse token decoding via a score-first, regress-once computation path.
+We parameterize both branches with lightweight MLPs, similar to prior MLP-based heads (e.g., LoRAT~\cite{lin2024loratrack}). We further tailor the head for sparse token decoding via a score-first, regress-once computation path.
 
 \textbf{Score-first, regress-once.} As illustrated in~\figref{main_frame}, the head contains two lightweight branches:
 \begin{itemize}

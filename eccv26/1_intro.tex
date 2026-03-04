@@ -4,7 +4,13 @@
 \begin{figure*}[t]
   \centering
   \includegraphics[width=\linewidth]{imgs/title_vs.pdf}
-  \caption{asdasdasdasd
+  \caption{\textbf{Speed–accuracy trade-off on edge platforms.}
+  Left: TrackingNet SUC vs.\ Orin Nano speed (FPS).
+  Right: LaSOT AUC vs.\ Raspberry Pi speed (FPS).
+  Bubble area is proportional to model parameter count.
+  Our MaST-\{small, tiny, nano\} achieve Pareto-optimal trade-offs,
+  delivering competitive or superior accuracy at significantly higher
+  speeds compared to prior lightweight trackers.
 }
   \label{fig:title}
 \end{figure*}
@@ -119,6 +125,8 @@ In this work, we propose \textbf{MaST}
 (\textbf{M}otion-\textbf{a}ware \textbf{S}parse \textbf{T}racker),
 a sparse tracking framework that addresses these
 limitations with a cohesive design.
+As shown in~\figref{fig:title}, MaST variants achieve
+Pareto-optimal speed–accuracy trade-offs on edge platforms.
 %
 MaST performs early, task-driven token reduction in the search region by
 injecting a history-based motion prior into the selection process.

@@ -4,7 +4,7 @@
     \resizebox{0.7\linewidth}{!}{
         \begin{tabular}{l| ccc | c|c|c}
             \toprule
-            \multirow{2}*{Sparsification} & \multicolumn{3}{c|}{{LaSOT}} & \multirow{2}*{\shortstack{Encoder \\ MACs}} & \multirow{2}*{FPS} & {FPS} \\
+            \multirow{2}*{Sparsification By} & \multicolumn{3}{c|}{{LaSOT}} & \multirow{2}*{\shortstack{Encoder \\ MACs}} & \multirow{2}*{FPS} & {FPS} \\
                                          & {AUC}                        & P$_{Norm}$                   & P &&& Boost \\
                                          
             \midrule[0.5pt]
@@ -12,6 +12,7 @@
             % Progressive             & 64.1  & 74.2  & 68.1  & 1.36G &  & 1.35$\times$\\
             Attention                       & 60.5  & 71.9  & 65.6  & 824M & 48.9 & 2.11$\times$\\
             Prediction                      & 59.4  & 71.4  & 64.9  & 874M & 42.1 & 1.81$\times$\\
+            \rowcolor{gray!15}
             Attention + Motion              & 63.8  & 73.6  & 67.9  & 824M & 48.3 & 2.08$\times$\\
             Motion                          & 62.6  & 72.2  & 66.4  & 824M & 49.0 & 2.11$\times$\\
             % Prediction + MW (\texttt{1} @30\%)              & 64.1  & 74.2  & 68.3  & 0.83G &  & 2.02$\times$\\

@@ -1,0 +1,23 @@
+% Redesigned tab:head — compares prediction heads under dense vs sparse backbone (ViT-Tiny, 30% sparse + Motion Window)
+\begin{table}[ht]    
+\centering
+    \caption{table}{Comparison of prediction heads on LaSOT with ViT-Tiny backbone.}
+    \resizebox{0.7\linewidth}{!}{
+        \begin{tabular}{l | cc | cc | cc}
+            \toprule
+            \multirow{2}{*}{Prediction Head} 
+                & \multicolumn{2}{c|}{AUC} 
+                & \multicolumn{2}{c|}{MACs (G)} 
+                & \multicolumn{2}{c}{FPS} \\
+            & Dense & Sparse & Dense & Sparse & Dense & Sparse \\
+            \midrule
+            Loc Tokens~\cite{mixformerv2}    & 59.0          & 57.9          & 1.76          & 0.845          & --  & -- \\
+            3$\times$3 Conv~\cite{ostrack}   & 65.0          & 63.6          & 2.39          & 1.463          & --  & -- \\
+            MLP (Dense)~\cite{lin2024loratrack}              & 64.1          & 63.3          & 1.79          & 0.864          & --  & -- \\
+            Trans. Decoder                   & 61.4          & 60.1          & 1.88          & 0.833          & --  & -- \\
+            \rowcolor{gray!15}
+            MLP (Sparse) & {64.1} & {63.3} & {1.75} & {0.824} & {23.2} & {48.3} \\
+            \bottomrule
+        \end{tabular}}
+    \label{tab:head}
+\end{table}
