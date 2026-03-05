@@ -1,17 +1,21 @@
 \begin{table}[ht]
     \centering
-    \caption{Comparison with alternative model compression strategies under the same computational budget ($\approx$820--870M MACs, ViT-Tiny backbone, LaSOT). ``$\downarrow$ Resolution'' reduces the search image size; ``Layer Pruning'' removes the last $N$ Transformer layers; our method applies motion-aware token sparsification at Layer~1 with 30\% retention. \textbf{Bold}: best result.}
+    \caption{Comparison with alternative model compression strategies under the same computational budget ($\approx$1G MACs, ViT-Tiny backbone). ``$\downarrow$ Resolution'' reduces the input image size to (48,96); ``$\downarrow$ Layer'' compresses  the encoder into 4 layers; our method applies motion-aware token sparsification at Layer~1 with 30\% retention.}
     \resizebox{0.8\linewidth}{!}{
-        \begin{tabular}{l | c | c c c | c}
+        \begin{tabular}{l | l | c | c c c | c c c}
             \toprule
-            Method & MACs (M) & AUC $\uparrow$ & P$_{Norm}$ $\uparrow$ & P $\uparrow$ & FPS $\uparrow$ \\
+            \multirow{2}{*}{Compression Method} & \multirow{2}{*}{From}                  & \multirow{2}{*}{\shortstack{MACs                                                                                           \\(M)}}  & \multicolumn{3}{c|}{LaSOT}            & \multicolumn{3}{c}{FPS}      \\
+
+                                                &                                        &                                  & AUC           & P$_{Norm}$    & P             & RPi5          & CPU        & Nano       \\
             \midrule
-            Full model (baseline)                       & 1752 & 64.3 & 74.2 & 68.3 & 23.2 \\
+            Full model                          & -                                      & 1752                             & 64.0          & 74.2          & 68.3          & 9.1           & 37         & 94         \\
             \midrule
-            $\downarrow$ Resolution ($224\to160$ px)    & 856  & 60.1 & 70.3 & 63.9 & 38.4 \\
-            $\downarrow$ Layer (ViT-tiny-4)                 & 864  & 61.8 & 71.6 & 65.4 & 34.1 \\
+            $\downarrow$ Token (Progressive)    & OSTrack~\cite{ostrack}                 & 1293                             & 64.0          & 74.1          & 68.1          & 10.5          & 41         & 106          \\
+            $\downarrow$ Resolution             & LoReTrack~\cite{dong2024loretrack}     & 990                              & 58.5          & 67.7          & 59.4          & 23.6             & 83          & 176          \\
+            $\downarrow$ Layer                  & CompressTracker~\cite{compressTracker} & 937                              & 59.1          & 68.5          & 60.1          & 24.1             & 89          & 177          \\
+
             \rowcolor{gray!15}
-            \textbf{Token Sparsification (Ours)}        & \textbf{824}  & \textbf{63.8} & \textbf{73.6} & \textbf{67.9} & \textbf{48.3} \\
+            $\downarrow$ Token (One-shot)       & Ours                                   & {836}                     & {63.8} & {73.6} & {67.9} & {22.6} & {76} & {152} \\
             \bottomrule
         \end{tabular}}
     \label{tab:compress}

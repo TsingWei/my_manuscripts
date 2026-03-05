@@ -1,0 +1,27 @@
+\begin{wraptable}{r}{0.40\textwidth}
+    \centering
+    \vspace{-2em}
+    \caption{Details of our MaST model variants.}
+    \label{tab:model-card}
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1}
+    \small
+    \resizebox{\linewidth}{!}{
+        \begin{tabular}{l | c c c}
+            \toprule
+            \multirow{2}{*}{Model} & \multicolumn{3}{c}{MaST}                       \\
+            \cmidrule(l){2-4}
+                                   & nano                     & tiny     & small    \\
+            \midrule
+            Backbone               & \multicolumn{3}{c}{ViT-Tiny} \\
+            Encoder Layers         & 8                        & 12       & 12       \\
+            Template Size          & 128                      & 128      & 192      \\
+            Search Size            & 256                      & 256      & 384      \\
+            Token Rate (\%)        & 30                       & 30       & 30       \\
+            MACs (G)               & 0.59                     & 0.84     & 1.82     \\
+            Params (M)             & 3.85                     & 5.63     & 5.63     \\
+            \bottomrule
+        \end{tabular}
+    }
+    % \vspace{-1em}
+\end{wraptable}

@@ -1,7 +1,30 @@
 \section{Experiment}
 \label{Experiment}
-\input{tables/tab_allr}
 
+
+
+\input{tables/tab_model_card}
+\textbf{Device.} 
+Our MaST models are implemented using Python 3.10 and PyTorch 2.4.1. Training is conducted on a single NVIDIA RTX 3090 GPU. We evaluate inference speed on three representative edge platforms: Raspberry Pi 5, Apple M4, and NVIDIA Jetson Orin Nano. 
+To ensure a consistent evaluation environment and better reflect real-world application deployment, we export ONNX files with OpSet 17 and benchmark with ONNXRuntime 1.20.1 to report practical on-device performance. For trackers whose source code is publicly available, we re-evaluate their speed under the same protocol to ensure a fair comparison.
+
+
+
+\textbf{Model.} 
+To demonstrate our method on the low-cost edge device, we use ViT-Tiny~\cite{vit} as the encoder and the training are initialized with the MAE-lite~\cite{wang2023maelite}.
+We provide three model variants with different backbones, encoder depths, and token retention rates, as summarized in~\tabref{tab:model-card}.
+MaST-nano uses the first 8 layers of ViT-Tiny with a 20\% retention rate for maximum efficiency; MaST-tiny employs the full 12-layer ViT-Tiny with 30\% retention; MaST-small scales to ViT-Small with 30\% retention for higher accuracy.
+% We provide the 30\% tokens retraining model as MaST-tiny, and a lighter model that only using first 8 layers as MaST-nano, to show the compatibility of our method with layer pruning.  More results with various token retention rates can be seen in ablation studies.
+
+
+
+
+
+\textbf{Training.} 
+The training splits of COCO~\cite{coco}, LaSOT~\cite{lasot}, GOT-10k~\cite{got10k} and TrackingNet~\cite{trackingnet} are used for training. Common data augmentations including horizontal flip and brightness jittering are used in training. The GPU holds 128 image pairs as the batch size. We train the model with AdamW optimizer~\cite{adamw}, set the weight decay to $10^{-4}$, the initial learning rate for the backbone to $4\times10^{-5}$ and other parameters to $4\times10^{-4}$, respectively. The total training epochs are set to 300 with 60k image pairs per epoch and we decrease the learning rate by a factor of 10 after 240 epochs.  The sparsification rate is gradually warmed-up during training following OSTrack~\cite{ostrack}.  More details of training and hyper-parameters can be found in the supplementary material.
+
+
+\input{tables/tab_allr}
 \begin{table*}[t]
   \centering
   \begin{minipage}[t]{0.615\textwidth}
@@ -12,51 +35,61 @@
     \input{tables/tab_vast.tex}
   \end{minipage}
 \end{table*}
-
-\textbf{Device.} 
-Our MaST models are implemented using Python 3.10 and PyTorch 2.4.1. Training is conducted on a single NVIDIA RTX 3090 GPU. We evaluate inference speed on three representative edge platforms: Raspberry Pi 5, Apple M4, and NVIDIA Jetson Orin Nano. 
-To ensure a consistent evaluation environment and better reflect real-world application deployment, we export ONNX files with OpSet 17 and benchmark with ONNXRuntime 1.20.1 to report practical on-device performance. For trackers whose source code is publicly available, we re-evaluate their speed under the same protocol to ensure a fair comparison.
-
-
-\textbf{Model.} 
-To demonstrate our method on the low-cost edge device, we use ViT-Tiny~\cite{vit} as the encoder and the training are initialized with the MAE-lite~\cite{wang2023maelite}.  
-% We provide the 30\% tokens retraining model as MaST-tiny, and a lighter model that only using first 8 layers as MaST-nano, to show the compatibility of our method with layer pruning.  More results with various token retention rates can be seen in ablation studies.   
-
-
-
-
-
-\textbf{Training.} 
-The training splits of COCO~\cite{coco}, LaSOT~\cite{lasot}, GOT-10k~\cite{got10k} and TrackingNet~\cite{trackingnet} are used for training. Common data augmentations including horizontal flip and brightness jittering are used in training. The GPU holds 128 image pairs as the batch size. We train the model with AdamW optimizer~\cite{adamw}, set the weight decay to $10^{-4}$, the initial learning rate for the backbone to $4\times10^{-5}$ and other parameters to $4\times10^{-4}$, respectively. The total training epochs are set to 300 with 60k image pairs per epoch and we decrease the learning rate by a factor of 10 after 240 epochs.  The sparsification rate is gradually warmed-up during training following OSTrack~\cite{ostrack}.  More details of training and hyper-parameters can be found in the supplementary material.
-
-
 \subsection{Comparison with State-of-the-arts}
 We conduct a comprehensive comparison on five widely used tracking benchmarks. Trackers are grouped into three tiers: $\sim$500M, $\sim$1G, and $\sim$2G MACs---based on their computational cost, and compared within the same tier.
 
-\textbf{LaSOT.} LaSOT~\cite{lasot} is a large-scale long-term tracking benchmark comprising 1,400 video sequences with 280 sequences reserved for testing. As shown in~\tabref{tab-sota-efficient}, MaST-tiny achieves the highest AUC of 63.3 and $P_{Norm}$ of 72.2 in the $\sim$1G group, outperforming AsymTrack-S~\cite{zhu2025asymtrack} by +0.5 AUC and HiT-Small~\cite{HiT} by +2.8 AUC, while running at 22.6 FPS on Raspberry Pi 5. MaST-small further pushes to 65.8 AUC in the $\sim$2G group, surpassing FERMT~\cite{fermt} by +0.7 AUC.
+\textbf{LaSOT.} LaSOT~\cite{lasot} is a large-scale long-term tracking benchmark comprising 1,400 video sequences with 280 sequences reserved for testing. As shown in~\tabref{tab-sota-efficient}, MaST-tiny achieves the highest AUC of 63.8 and $P_{Norm}$ of 72.2 in the $\sim$1G group, outperforming AsymTrack-S~\cite{zhu2025asymtrack} by +1.0 AUC and HiT-Small~\cite{HiT} by +3.3 AUC, while running at 22.6 FPS on Raspberry Pi 5. MaST-small further pushes to 65.8 AUC in the $\sim$2G group, surpassing FERMT~\cite{fermt} by +0.7 AUC.
 
 \textbf{TrackingNet.} TrackingNet~\cite{trackingnet} is a large-scale short-term benchmark with 511 test sequences covering diverse real-world scenarios. MaST-tiny leads the $\sim$1G group with 80.1 SUC and $P_{Norm}$ of 85.3, surpassing AsymTrack-S by +2.2 SUC. In the $\sim$2G group, MaST-small achieves 82.3 SUC, outperforming all competing methods in its tier.
 
-\textbf{GOT-10k.} GOT-10k~\cite{got10k} is a large-scale dataset with 180 test sequences featuring non-overlapping object categories between train and test splits, designed to measure generalization. MaST-tiny attains an AO of 66.6 and $\text{SR}_{0.75}$ of 62.5 in the $\sim$1G group, outperforming AsymTrack-S by +1.1 AO and +3.6 $\text{SR}_{0.75}$. MaST-small achieves the top AO of 70.0 and $\text{SR}_{0.75}$ of 67.0 in the $\sim$2G group.
+\textbf{GOT-10k.} GOT-10k~\cite{got10k} is a large-scale dataset with 180 test sequences featuring non-overlapping object categories between train and test splits, designed to measure generalization. MaST-tiny attains an AO of 66.6 and $\text{SR}_{0.75}$ of 62.5 in the $\sim$1G group, outperforming AsymTrack-S by +1.1 AO and +3.6 $\text{SR}_{0.75}$. MaST-small achieves 70.0 AO and the highest $\text{SR}_{0.75}$ of 67.0 in the $\sim$2G group.
 
-% \textbf{UAV Benchmarks.} UAV123~\cite{uav123} and DTB70~\cite{dtb70} are aerial tracking datasets focusing on low-altitude scenarios with fast motion, small targets, and frequent occlusion. As reported in~\tabref{tab:uav-uav123} and~\tabref{tab:uav-dtb70}, MaST-tiny achieves 63.8 AUC on UAV123 and 63.3 AUC on DTB70, outperforming other lightweight trackers such as HiT-Tiny and FEAR-XS. MaST-nano achieves competitive results with 61.3 AUC on UAV123 and 61.8 AUC on DTB70, demonstrating its suitability for resource-constrained aerial tracking tasks.
 
+\textbf{LaSOT$_{\text{ext}}$.} LaSOT$_{\text{ext}}$~\cite{lasot} extends LaSOT with 150 test sequences covering more diverse and challenging long-term scenarios. As reported in~\tabref{tab:more-benchmarks}, MaST-small achieves the highest AUC of 45.3, surpassing FARTrack$_\text{tiny}$~\cite{wang2026fartrack} by +0.3 and AsymTrack-B~\cite{zhu2025asymtrack} by +0.7. MaST-tiny achieves 42.8 AUC at 22.6 FPS on Raspberry Pi 5---over $3{\times}$ faster than AsymTrack-B (6.2 FPS)---offering a favorable speed--accuracy trade-off for long-term tracking.
+
+\textbf{UAV123.} UAV123~\cite{uav123} is an aerial tracking benchmark with 123 low-altitude UAV sequences featuring fast motion, small targets, and frequent occlusion. MaST-tiny achieves the highest AUC of 66.6 among all compared methods, outperforming LiteTrack-B4~\cite{LiteTrack} (66.4) and AsymTrack-B~\cite{zhu2025asymtrack} (66.5) while running at 22.6 FPS on Raspberry Pi 5. MaST-nano attains 62.9 AUC at a leading 30.1 FPS, making it well-suited for resource-constrained aerial applications.
+
+\textbf{NFS.} NFS~\cite{nfs} is a high-frame-rate benchmark with 100 sequences featuring fast-moving objects that challenge tracker responsiveness.  Under 30fps setting, MaST-tiny achieves 66.2 AUC, second only to FARTrack$_\text{tiny}$~\cite{wang2026fartrack} (66.9) while running substantially faster on edge devices. MaST-small achieves 65.7 AUC, surpassing AsymTrack-B~\cite{zhu2025asymtrack} (64.4) and HiT-Base~\cite{HiT} (63.6).
+
+\textbf{VastTrack.} VastTrack~\cite{peng2024vasttrack} is a large-vocabulary benchmark spanning 2,115 object categories with over 50,000 sequences, designed to evaluate tracking generalization across a vast range of target types. As shown in~\tabref{tab:vast}, MaST-small achieves a SUC of 35.6 and P$_{Norm}$ of 43.2, surpassing heavier MixFormerV2-B~\cite{mixformerv2}(35.2 SUC) by +0.4. The P$_{Norm}$ advantage is particularly striking at $+6.7$ over the next-best method, suggesting superior localization accuracy normalized by target scale. 
+
+% MaST-tiny also attains the second-highest P$_{Norm}$ of 40.7 among all methods, further demonstrating strong spatial precision across diverse object categories.
 
 
 
 \subsection{Ablation Study}
 % For efficient experiments, We train our model on GOT-10k train split and test on val split for ablation studies as default setting.
 
+\begin{table}[ht]
+  \input{tables/tab_token.tex}
+\end{table}
+\begin{table}[ht]
+  \input{tables/tab_head}
+\end{table}
+
+% 并排两张表
+% \begin{table*}[t]
+%   \centering
+%   \begin{minipage}[t]{0.495\textwidth}
+%     \input{tables/tab_token.tex}
+%   \end{minipage}
+%   \hfill
+%   \begin{minipage}[t]{0.495\textwidth}
+   
+%     \input{tables/tab_head}
+%   \end{minipage}
+% \end{table*}
 
 \textbf{Impact of Different Sparsification Strategies.}
-\tabref{tab:sparse} compares the performance and efficiency of various token sparsification strategies. The dense baseline (``None'') retains all tokens at 1752M encoder MACs, while naive attention-score-only pruning at the first layer (``Attention'') reduces computation to 824M MACs ($2.11{\times}$ speedup) but suffers a sharp \textbf{3.8 AUC} drop---demonstrating that early cross-attention scores alone are too diffuse for reliable pruning.  Replacing the score source with the prediction-box prior (``Prediction'') is worse, dropping to 59.4 AUC.  
-The proposed \textbf{Motion Window (MW) mechanism} is the key enabler: combining attention scores with the Gaussian spatial prior (``Attention + Motion'') recovers 3.3 AUC relative to the attention-only baseline while keeping the same 824M MACs and $2.08{\times}$ FPS boost, closing the gap to only \textbf{0.5 AUC} below the dense model.  Using the motion window alone (``Motion'') yields a middle ground, confirming that the fusion of both signals is optimal.  These results underscore that injecting a lightweight temporal motion prior is critical to making aggressive early-layer sparsification practically viable.
-\input{tables/tab_token.tex}
+\tabref{tab:sparse} compares various token sparsification strategies. Naive pruning based solely on attention scores (``Attention'') achieves significant compute reduction but suffers a severe accuracy drop, revealing that early cross-attention scores are too diffuse to reliably identify important tokens. Replacing attention with an MLP predictor (``Prediction'') is even worse, as it lacks spatial grounding. The proposed motion prior is the key enabler: fusing attention scores with the Gaussian spatial prior (``Attention + Motion'') nearly closes the accuracy gap to the dense baseline while preserving the full compute savings. Using the motion window alone (``Motion'') yields a middle ground, confirming that the fusion of both signals is optimal. These results underscore that a lightweight temporal prior is critical to making aggressive early-layer sparsification practically viable.
+
 
 
 \textbf{Analysis of Different Prediction Heads.}
-\tabref{tab:head} compares five prediction heads under ViT-Tiny with a dense backbone versus 30\% sparse backbone plus motion window. Two key findings emerge. \textbf{First}, sparsification consistently reduces MACs for every head---by $1.8{\times}$--$1.9{\times}$---with only marginal AUC drops ($\le$1.5 points), confirming that the backbone is the dominant bottleneck. \textbf{Second}, not all heads benefit equally in terms of \emph{speed}: Loc-Token and Transformer-Decoder heads introduce heavy sparse-to-dense reshaping or cross-attention, limiting practical FPS gains. Our 1$\times$1 Conv head is natively sparse, achieving the highest FPS of 48.3 on Raspberry Pi 5 while matching the MLP head in AUC (63.8 dense / 63.8 sparse). We hypothesize that position-dependent designs (boxes are decoded with anchor point) suit lightweight models better than global aggregators (Loc Tokens, Transformer Decoder), where model capacity is insufficient to learn purely attention-driven localization.
-
+\tabref{tab:head} compares prediction heads under two paradigms.
+\emph{Global localization} heads (Loc Tokens, Trans.\ Decoder) are naturally sparse-compatible and achieve good speedups, but their accuracy is limited (57.9--60.1 AUC) due to insufficient spatial prior.
+\emph{Anchor-based} heads yield higher accuracy (63.8--64.1 AUC), yet the conventional 3$\times$3 Conv-stacked head must reshape sparse tokens back to a dense grid, incurring redundant computation and capping throughput at 13.8 FPS.
+Our Sparse MLP operates exclusively on retained tokens, improving throughput to 23.2 FPS with no accuracy loss over the dense MLP counterpart~\cite{lin2024loratrack} (63.8 AUC in both cases), confirming the value of a natively sparse head design.
 
 
 % \begin{figure}[h]
@@ -76,11 +109,8 @@ The proposed \textbf{Motion Window (MW) mechanism} is the key enabler: combining
 
 
 
-% \input{tables/tab_layer}
-
 % \bigskip
 
-\input{tables/tab_head}
 
 
 
@@ -88,12 +118,15 @@ The proposed \textbf{Motion Window (MW) mechanism} is the key enabler: combining
 
 % \textbf{Analysis of Heads Under Various Sparse Rates.}
 % \figref{abl_vs} also examines the impact of 1×1 and 3×3 convolution heads on the efficiency of the sparsification framework when motion windows are applied. The results clearly show that the 1×1 convolution head (orange solid line) achieves significantly higher FPS compared to the 3×3 convolution head (blue solid line) at all token retention rates, while maintaining comparable AUC performance. For example, at a 30\% token retention rate, the 1×1 head achieves around 20 FPS, whereas the 3×3 head only reaches approximately 13 FPS. This is due to the reduced computational complexity of 1×1 convolutions, which makes them more suitable for sparse scenarios with fewer tokens. These findings highlight the efficiency advantage of 1×1 convolutions in real-time tracking tasks under computational constraints. 
-\begin{wrapfigure}{l}{0.5\textwidth}
+\begin{wrapfigure}{l}{0.3\textwidth}
     \centering
-    \includegraphics[width=0.4\textwidth]{imgs/abl_token_rate.pdf}
-    \caption{{AUC–FPS trade-off at different token retention rates on GOT-10k val.}}
+    \vspace{-1.5em}
+    \includegraphics[width=0.3\textwidth]{imgs/abl_token_rate.pdf}
+    \caption{{AUC–FPS trade-off at different token retention rates on GOT-10k val}}
     \label{token_rate}
+    \vspace{-0.5em}
 \end{wrapfigure}
+
 
 \textbf{Impact of Token Retention Rate.}
 \figref{token_rate} examines how the token retention rate affects the AUC–FPS trade-off at two
@@ -105,28 +138,32 @@ competitive.
 In both settings the motion-aware prior guides early token selection reliably regardless of input
 scale, confirming that MaST's accuracy–efficiency trade-off is robust across resolution choices.
 
+\input{tables/tab_layer}
 \textbf{Layer-wise Sparsification Analysis.}
-\tabref{tab:layer} evaluates the effect of applying token sparsification at different layers (all with motion window) of the ViT-Tiny encoder. {Layer 1} achieves the best balance: 63.8 AUC, 24.6 FPS on Raspberry Pi 5, and the lowest cost of 862M FLOPs. 
-Delaying sparsification to later layers yields marginal AUC gains ($\le$0.4 points) at the cost of nearly halving throughput (24.6 $\to$ 12.5 FPS). This confirms that very early pruning guided by the motion window is sufficient and optimal, and we set Layer 1 as default.
+\tabref{tab:layer} evaluates the effect of applying token sparsification at different layers (all with motion window) of the ViT-Tiny encoder. Under the motion prior, the choice of sparsification layer has only a negligible impact on accuracy: AUC varies by at most 0.4 points across all configurations. In contrast, the speed penalty of delaying sparsification is substantial---throughput nearly halves from 22.6 to 10.1 FPS when sparsification is pushed to later layers. Sparsifying at Layer 1 therefore offers the best cost-effectiveness: it matches the accuracy of later-layer alternatives while delivering the highest throughput (22.6 FPS) and the lowest compute (862M FLOPs), and we adopt it as our default.
 
-\textbf{Why the Sparse Head Enables Additional Speedup.}
-\tabref{tab:speed} isolates the contribution of the prediction head to the overall speedup. Dense-compatible heads (e.g., 3$\times$3 conv, Loc Tokens, Transformer Decoder) must first reshape the sparse token set back to a full spatial grid before computation, so their head MACs are \emph{unchanged} by backbone sparsification. In contrast, our 1$\times$1 conv head and the MLP head operate natively on the retained tokens, reducing head MACs by ${\approx}3.4\times$ proportionally to the retention rate. This co-design of a sparse backbone with a natively sparse head is critical: it translates the $2.08\times$ backbone FLOPs reduction into a $\mathbf{2.08\times}$ overall FPS gain on edge devices.
+% \textbf{Why the Sparse Head Enables Additional Speedup.}
+% \tabref{tab:speed} isolates the contribution of the prediction head to the overall speedup. Dense-compatible heads (e.g., 3$\times$3 conv, Loc Tokens, Transformer Decoder) must first reshape the sparse token set back to a full spatial grid before computation, so their head MACs are \emph{unchanged} by backbone sparsification. In contrast, our 1$\times$1 conv head and the MLP head operate natively on the retained tokens, reducing head MACs by ${\approx}3.4\times$ proportionally to the retention rate. This co-design of a sparse backbone with a natively sparse head is critical: it translates the $2.08\times$ backbone FLOPs reduction into a $\mathbf{2.08\times}$ overall FPS gain on edge devices.
 % \input{tables/tab_speed}
 
 \textbf{Comparison with Alternative Compression Strategies.}
-\tabref{tab:compress} compares MaST against two common compression baselines under an identical compute budget ($\approx$850M MACs): (1) \emph{Resolution Reduction}, which downscales the search image from $224$ to $160$ pixels, and (2) \emph{Layer Pruning}, which removes the last 4 Transformer layers. At the same MACs, resolution reduction suffers a 4.2 AUC drop, and layer pruning drops 2.5 AUC, while our token sparsification retains 63.8 AUC---only 0.5 below the dense baseline. Furthermore, our method achieves 48.3 FPS, substantially faster than both baselines, demonstrating that spatial token sparsification is a superior compression strategy for tracking compared to reducing input resolution or model depth.
+\tabref{tab:compress} compares MaST against three compression baselines under an identical compute budget ($\approx$1G MACs, ViT-Tiny backbone): the full dense model (1752M MACs), progressive token pruning from OSTrack~\cite{ostrack}, resolution reduction from LoReTrack~\cite{dong2024loretrack}, and layer pruning from CompressTracker~\cite{compressTracker}.
+Progressive token pruning retains accuracy (64.0 AUC) but provides negligible speedup (9.1$\to$10.5 FPS on RPi5) due to its multi-stage, non-one-shot design.
+Resolution reduction and layer pruning achieve comparable FPS ($\sim$24 FPS on RPi5) but at a severe accuracy cost of $-5.5$ and $-4.9$ AUC, respectively.
+Our one-shot token sparsification achieves the lowest MACs (836M) and the best AUC (63.8), within 0.2 of the dense baseline, while maintaining competitive speed (22.6 FPS on RPi5). This demonstrates that spatially-guided one-shot token sparsification offers a clearly superior accuracy--efficiency trade-off compared to resolution reduction or model depth compression.
+
 \input{tables/tab_compress}
 
 
 
 
-
+% \vspace{-0.5em}
 \textbf{Visualization of the token sparsification process.}
  The left panel of \figref{vis_window} shows baseline sparsification based on raw importance scores, resulting in scattered token retention. The right panel illustrates our motion-aware sparsification, where a motion window re-ranks importance scores based on previous predictions, producing more coherent retention patterns.
 \begin{figure*}[htbp]
-    \vskip 0.2in
+    % \vskip 0.2in
     \begin{center}
-    \centerline{\includegraphics[width=0.9\textwidth]{imgs/window_vis_xs.png}}
+    \centerline{\includegraphics[width=0.99\textwidth]{imgs/window_vis_xs.png}}
     % \vskip -0.4in
     \caption{Visualization of the token sparsification process. The left panel shows baseline sparsification based on raw importance scores, resulting in scattered token retention. The right panel illustrates our motion-aware sparsification, where a motion window re-ranks importance scores based on previous predictions, producing more coherent retention patterns.}
     \label{vis_window}

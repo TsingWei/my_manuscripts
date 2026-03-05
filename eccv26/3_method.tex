@@ -47,6 +47,14 @@ where $(u_i, v_i)$ is the spatial location of the $i$-th token. This combined sc
 
 
 \subsection{Fully Sparse Prediction Head}
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \centering
+    % \vspace{-2.5em}
+    \includegraphics[width=0.5\textwidth, trim=4pt 5pt 0pt 0pt, clip]{imgs/sparse_head.pdf}
+    \caption{{AUC–FPS trade-off at different token retention rates on GOT-10k val}}
+    \label{fig:sparse_head}
+    \vspace{-0.5em}
+\end{wrapfigure}
 Our goal is to avoid the dense-head bottleneck when the backbone operates on a sparsified, unstructured token set. Let the retained search tokens be
 \(\mathcal{L}_K = \{\mathbf{f}_k\}_{k=1}^{N_K}\), where $N_K\ll H_xW_x/P^2$ and each token keeps its original 2D location on the patch grid, denoted as $\mathbf{p}_k=(u_k,v_k)$.
 We design a natively sparse head that directly consumes $\mathcal{L}_K$ without padding or reshaping back to a dense feature map.

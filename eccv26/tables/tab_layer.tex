@@ -1,21 +1,21 @@
-\begin{wraptable}{r}{0.4\textwidth}
+\begin{wraptable}{r}{0.3\textwidth}
     \centering
-    \vspace{-1em}
+    \vspace{-2em}
     \caption{Effect of sparsification layer on tracking accuracy and efficiency.}
     \resizebox{\linewidth}{!}{
         \begin{tabular}{c | c c c}
             \toprule
-            \shortstack{Sparsify \\ at Layer} & AUC & FPS & FLOPs (M) \\
+            \shortstack{Sparsify \\ at Layer} & \shortstack{LaSOT \\ AUC} & \shortstack{RPi \\ FPS} & \shortstack{MACs \\ (M)} \\
             \midrule
             \rowcolor{gray!15}
-            \textbf{1} & {63.3} & \textbf{22.6} & \textbf{862}  \\
-            2          & 63.4          & 17.6          & 942           \\
-            3          & 63.4          & 14.0          & 1004          \\
-            4          & 63.6          & 12.1          & 1080          \\
-            5          & 63.8          & 11.3          & 1154          \\
-            6          & 63.7          & 10.1          & 1238          \\
+            {1} & {63.82} & {22.6} & {862}  \\
+            2          & 63.87          & 17.6          & 942           \\
+            3          & 63.65          & 14.0          & 1004          \\
+            4          & 63.83          & 12.1          & 1080          \\
+            5          & 63.91          & 11.3          & 1154          \\
+            6          & 63.96          & 10.1          & 1238          \\
             \bottomrule
         \end{tabular}}
     \label{tab:layer}
-    \vspace{-1em}
+    % \vspace{-1em}
 \end{wraptable}

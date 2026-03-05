@@ -1,28 +1,29 @@
 \centering
-    \caption{Comparison on the VastTrack\cite{peng2024vasttrack} benchmark.}
-    \resizebox{\linewidth}{!}{
-        % \renewcommand{\arraystretch}{1.0}
-        \begin{tabular}{l | c c c}
-            \toprule
-            \multirow{2}{*}{Method} & \multicolumn{3}{c}{VastTrack} \\ & SUC & P$_{Norm}$ & Prec \\
-            \midrule
-            % ATOM & 17.2 & 14.1 & 10.2 \\
-            Ocean\cite{Ocean} & 27.5 & 30.2 & 24.6 \\
-            SiamRPN++\cite{SiamRPN++} & 28.1 & 29.7 & 24.9 \\
-            TransT\cite{TransT} & 29.9 & 31.4 & 25.4 \\
-            DiMP\cite{DiMP} & 29.9 & 31.7 & 25.7 \\
-            STARK\cite{STARK} & 33.4 & 34.3 & 30.8 \\
-            OSTrack\cite{ostrack} & 33.6 & 34.5 & 31.5 \\
-            % ToMP & 34.9 & 36.4 & 32.1 \\
-            % ARTrack & \rankfirst{35.6} & 35.8 & \ranksecond{32.4} \\
-            MixFormerV2-B\cite{mixformerv2} & \ranksecond{35.2} & 36.5 & \rankfirst{33.0} \\
-            FARTrack$_\text{pico}$\cite{wang2026fartrack} & 30.3 & 33.0 & 25.7 \\
-            FARTrack$_\text{nano}$\cite{wang2026fartrack} & 33.9 & 35.1 & 30.3 \\
-            FARTrack$_\text{tiny}$\cite{wang2026fartrack} & \ranksecond{35.2} & 36.5 & 32.3 \\
-            \midrule[0.3pt]
-            \textbf{MaST-nano} & 30.6 & 37.8 & 30.1 \\
-            \textbf{MaST-tiny} & 33.4 & \ranksecond{40.7} & 26.2 \\
-            \textbf{MaST-small} & \rankfirst{35.6} & \rankfirst{43.2} & \rankfirst{33.0} \\
-            \bottomrule
-        \end{tabular}}
-    \label{tab:vast}
+\caption{Comparison on the VastTrack\cite{peng2024vasttrack} benchmark.}
+\resizebox{\linewidth}{!}{
+    % \renewcommand{\arraystretch}{1.0}
+    \begin{tabular}{l | c c c}
+        \toprule
+        \multirow{2}{*}{Method}                       & \multicolumn{3}{c}{VastTrack}                                        \\
+                                                      & SUC                           & P$_{Norm}$        & Prec             \\
+        \midrule
+        ATOM & 17.2 & 14.1 & 10.2 \\
+        % Ocean\cite{Ocean}                             & 27.5                          & 30.2              & 24.6             \\
+        SiamRPN++\cite{SiamRPN++}                     & 28.1                          & 29.7              & 24.9             \\
+        TransT\cite{TransT}                           & 29.9                          & 31.4              & 25.4             \\
+        % DiMP\cite{DiMP}                               & 29.9                          & 31.7              & 25.7             \\
+        STARK\cite{STARK}                             & 33.4                          & 34.3              & 30.8             \\
+        OSTrack\cite{ostrack}                         & 33.6                          & 34.5              & 31.5             \\
+        % ToMP & 34.9 & 36.4 & 32.1 \\
+        ARTrack & \rankfirst{35.6} & 35.8 & \ranksecond{32.4} \\
+        MixFormerV2-B\cite{mixformerv2}               & \ranksecond{35.2}             & 36.5              & \rankfirst{33.0} \\
+        FARTrack$_\text{pico}$\cite{wang2026fartrack} & 30.3                          & 33.0              & 25.7             \\
+        FARTrack$_\text{nano}$\cite{wang2026fartrack} & 33.9                          & 35.1              & 30.3             \\
+        FARTrack$_\text{tiny}$\cite{wang2026fartrack} & \ranksecond{35.2}             & 36.5              & 32.3             \\
+        \midrule[0.3pt]
+        \textbf{MaST-nano}                            & 30.6                          & 37.8              & 30.1             \\
+        \textbf{MaST-tiny}                            & 33.4                          & \ranksecond{40.7} & 26.2             \\
+        \textbf{MaST-small}                           & \rankfirst{35.6}              & \rankfirst{43.2}  & \rankfirst{33.0} \\
+        \bottomrule
+    \end{tabular}}
+\label{tab:vast}

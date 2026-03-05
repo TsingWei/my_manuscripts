@@ -75,10 +75,10 @@ PRESET_MODE = "auto"
 
 PRESET_LASOT_ORINCPU = {
     "figsize": (6.0 * SCALE, 4.0 * SCALE), 
-    "x_min": 0,
-    "x_max": 45,
+    "x_min": 10,
+    "x_max": 110,
     "x_start": 0,
-    "x_interval": 10,
+    "x_interval": 20,
     "y_min": 53,
     "y_max": 67,
     "y_start": 50,
@@ -107,7 +107,7 @@ PRESET_TKNET_ORINGPU = {
 
 # Render jobs: script will generate these figures directly (no CLI needed)
 RENDER_PRESETS = [
-    {"metric_col": "LaSOT", "fps_col": "OrinCPU", "preset": "lasot_orincpu"},
+    {"metric_col": "LaSOT", "fps_col": "M4_fps", "preset": "lasot_orincpu"},
     {"metric_col": "TkNet", "fps_col": "OrinGPU", "preset": "tknet_oringpu"},
 ]
 
@@ -138,8 +138,8 @@ GMACS_FALLBACK = 1.0  # used when MACs(G) missing
 
 # Colors: publication-friendly palette (Tableau 10 / colorblind-friendly)
 COLOR_PALETTE = [
-    "#4E79A7",
-    "#59A14F",
+    "#95BE44",
+    "#386632A4",
     "#9C755F",
     "#B07AA1",
     "#283736",
