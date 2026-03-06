@@ -2,7 +2,7 @@
 \label{Method}
 
 \subsection{Overview}
-The proposed framework shown in ~\figref{main_frame} operates in three stages: motion prediction, token sparsification, and target decoding. Given an input video frame and the target's initial location, a pair of images is processed as input: a template image denoted as $Z \in \mathbb{R}^{3 \times H_{z} \times W_{z}}$ and a search image denoted as $X \in \mathbb{R}^{3 \times H_{x} \times W_{x}}$. These images are divided into non-overlapping patches of size $P \times P$, resulting in $P_{z} = \frac{H_{z} \times W_{z}}{P^2}$ patches for the template and $P_{x} = \frac{H_{x} \times W_{x}}{P^2}$ patches for the search region. After patch embedding concatenated together, features are simultaneously extracted and fusion in the form of sequence using a Transformer encoder, in which the sequence will be first handled by our proposed sparsification block. In the end, the retained tokens will be further processed by the prediction head.
+The proposed framework shown in ~\figref{main_frame} operates in three stages, namely motion prediction, token sparsification, and target decoding. Given an input video frame and the target's initial location, a pair of images is processed as input, consisting of a template image denoted as $Z \in \mathbb{R}^{3 \times H_{z} \times W_{z}}$ and a search image denoted as $X \in \mathbb{R}^{3 \times H_{x} \times W_{x}}$. These images are divided into non-overlapping patches of size $P \times P$, resulting in $P_{z} = \frac{H_{z} \times W_{z}}{P^2}$ patches for the template and $P_{x} = \frac{H_{x} \times W_{x}}{P^2}$ patches for the search region. After patch embedding concatenated together, features are simultaneously extracted and fusion in the form of sequence using a Transformer encoder, in which the sequence will be first handled by our proposed sparsification block. In the end, the retained tokens will be further processed by the prediction head.
 
 % In the motion prediction stage, we estimate a motion window that captures the likely location of the target in the current frame, leveraging the predicted target location from the previous frame as a prior. This motion window acts as a spatial constraint to guide the token sparsification process. In the token sparsification stage, redundant tokens outside the motion window are filtered out, while the remaining tokens are re-ranked based on their importance scores. Finally, the target decoding stage employs a fully sparse head, based on 1×1 convolutions, to process the sparsified token representations and produce the final tracking prediction. This design ensures computational efficiency without compromising tracking accuracy.
 
@@ -27,9 +27,9 @@ where $\mathbf{A}_{x \to z}[i, j]$ represents the attention weight between the $
 where $\mathbf{q}_i \in \mathbb{R}^d$ is the query feature of the $i$-th search token. This formulation focuses the importance scoring process on the interaction between search tokens and the central template token, providing a lightweight yet effective means of measuring token relevance.
 
 
-\textbf{Motion Prior Injection.} Directly using early-layer cross-attention scores for pruning is sub-optimal due to their diffuse and noisy nature. Tracking, however, provides a strong temporal cue: the target location changes smoothly across frames. We therefore build a simple spatial prior from the previous prediction and use it to guide token selection.
+\textbf{Motion Prior Injection.} Directly using early-layer cross-attention scores for pruning is sub-optimal due to their diffuse and noisy nature. Tracking, however, provides a strong temporal cue, as the target location changes smoothly across frames. We therefore build a simple spatial prior from the previous prediction and use it to guide token selection.
 
-Specifically, we construct a Motion Window over the search region, centered at the previous predicted target location, and use it to softly re-weight the cross-attention importance scores. In practice, we find that a 2D Gaussian provides an effective and lightweight realization. Given the predicted bounding box from the previous frame $\mathbf{b}_{t-1} = (x_{t-1}, y_{t-1}, w_{t-1}, h_{t-1})$, where $(x_{t-1}, y_{t-1})$ is the box center and $w_{t-1}$, $h_{t-1}$ are its width and height, the Gaussian is defined as:
+Specifically, as illustrated in the center panel of~\figref{main_frame}, we construct a Motion Window over the search region, centered at the previous predicted target location, and use it to softly re-weight the cross-attention importance scores. In practice, we find that a 2D Gaussian provides an effective and lightweight realization. Given the predicted bounding box from the previous frame $\mathbf{b}_{t-1} = (x_{t-1}, y_{t-1}, w_{t-1}, h_{t-1})$, where $(x_{t-1}, y_{t-1})$ is the box center and $w_{t-1}$, $h_{t-1}$ are its width and height, the Gaussian is defined as:
 
 \begin{align}
     \mathcal{G}_t(u, v) = \exp \left( -\frac{(u - x_{t-1})^2}{2 \sigma_x^2} - \frac{(v - y_{t-1})^2}{2 \sigma_y^2} \right),
@@ -51,25 +51,27 @@ where $(u_i, v_i)$ is the spatial location of the $i$-th token. This combined sc
     \centering
     % \vspace{-2.5em}
     \includegraphics[width=0.5\textwidth, trim=4pt 5pt 0pt 0pt, clip]{imgs/sparse_head.pdf}
-    \caption{{AUC–FPS trade-off at different token retention rates on GOT-10k val}}
+    \caption{\textbf{Dense vs.\ sparse prediction head.}
+    (A)~Dense head pads and reshapes sparse tokens into a full 2D grid, wasting computation on empty positions.
+    (B)~Our sparse head applies an MLP directly on retained tokens via sparse anchors, with no padding or reshape.}
     \label{fig:sparse_head}
     \vspace{-0.5em}
 \end{wrapfigure}
 Our goal is to avoid the dense-head bottleneck when the backbone operates on a sparsified, unstructured token set. Let the retained search tokens be
 \(\mathcal{L}_K = \{\mathbf{f}_k\}_{k=1}^{N_K}\), where $N_K\ll H_xW_x/P^2$ and each token keeps its original 2D location on the patch grid, denoted as $\mathbf{p}_k=(u_k,v_k)$.
-We design a natively sparse head that directly consumes $\mathcal{L}_K$ without padding or reshaping back to a dense feature map.
+As illustrated in~\figref{fig:sparse_head}, unlike dense heads that must pad and reshape sparse tokens back to a full 2D grid before stacked convolutions, we design a natively sparse head that directly consumes $\mathcal{L}_K$ without padding or reshaping back to a dense feature map.
 We parameterize both branches with lightweight MLPs, similar to prior MLP-based heads (e.g., LoRAT~\cite{lin2024loratrack}). We further tailor the head for sparse token decoding via a score-first, regress-once computation path.
 
-\textbf{Score-first, regress-once.} As illustrated in~\figref{main_frame}, the head contains two lightweight branches:
+\textbf{Score-first, regress-once.} As illustrated in~\figref{main_frame}, the head contains two lightweight branches.
 \begin{itemize}
-  \item \textbf{Score branch} $g_{\text{s}}$: predicts a scalar confidence $s_k\in\mathbb{R}$ for each retained token.
+  \item \textbf{Score branch} $g_{\text{s}}$ predicts a scalar confidence $s_k\in\mathbb{R}$ for each retained token.
       The target token is selected by
       \begin{equation}
         k^* = \arg\max_k\; s_k.
       \end{equation}
       This selection can be implemented by scattering $\{s_k\}$ to a sparse score map aligned with the original grid and applying an \texttt{ArgMax}, but no dense feature computation is required.
 
-  \item \textbf{Regression branch} $g_{\text{r}}$: predicts box parameters only \emph{once} for the selected token $\mathbf{f}_{k^*}$.
+  \item \textbf{Regression branch} $g_{\text{r}}$ predicts box parameters only \emph{once} for the selected token $\mathbf{f}_{k^*}$.
       Denoting the regression output as $\Delta_{k^*}$, the final box is decoded as
       \begin{equation}
         \hat{\mathbf{b}} = \mathrm{Decode}(\mathbf{p}_{k^*},\, \Delta_{k^*}).

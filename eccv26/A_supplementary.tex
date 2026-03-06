@@ -12,7 +12,7 @@ The radar chart in \figref{radar} shows that 30\% tokens with a motion window (b
 % \vskip -0.4in
 \begin{center}
 \centerline{\includegraphics[width=0.7\columnwidth]{imgs/radar_plot.png}}
-\caption{Per-attribute performance comparison using a radar chart. Results are shown for three setups: 100\% tokens, 30\% tokens with motion window, and 30\% tokens without motion window. The motion window significantly improves performance in challenging scenarios like fast motion, occlusion, and out-of-view cases.}
+\caption{Per-attribute performance comparison using a radar chart. Results are shown for three setups, namely 100\% tokens, 30\% tokens with motion window, and 30\% tokens without motion window. The motion window significantly improves performance in challenging scenarios like fast motion, occlusion, and out-of-view cases.}
 \label{radar}
 \end{center}
 % \vskip -0.4in
@@ -59,9 +59,9 @@ AVTrack                         & 64.1  & 274    & 78       & 17.3 & 7.7       \
 
 
 \subsection{More Visualizations.}
-1. Rapid Motion Scenario: The visualization of \figref{fig:vis1} demonstrates that MaST (30\% tokens with motion window) can robustly track rapidly moving objects, closely matching the performance of the full-token model (100\% tokens). In contrast, a naive sparsification strategy without the motion-aware component fails completely. This clearly illustrates the crucial role of our motion-aware sparsification in handling rapid motion cases.
+1. Rapid Motion Scenario. The visualization of \figref{fig:vis1} demonstrates that MaST (30\% tokens with motion window) can robustly track rapidly moving objects, closely matching the performance of the full-token model (100\% tokens). In contrast, a naive sparsification strategy without the motion-aware component fails completely. This clearly illustrates the crucial role of our motion-aware sparsification in handling rapid motion cases.
 
-2. Failure Cases under Extremely Challenging Conditions: We acknowledge there exist extreme conditions, e.g., low-quality UAV footage with significant appearance ambiguity in \figref{fig:vis2}, that surpass the capability of even the full-token model. Such difficulties are fundamentally challenging for existing state-of-the-art trackers, not limited to MaST. Therefore, performance degradation under these conditions stems from inherent limitations common to the tracking domain rather than from sparsification or motion-aware strategies.
+2. Failure Cases under Extremely Challenging Conditions. We acknowledge there exist extreme conditions, e.g., low-quality UAV footage with significant appearance ambiguity in \figref{fig:vis2}, that surpass the capability of even the full-token model. Such difficulties are fundamentally challenging for existing state-of-the-art trackers, not limited to MaST. Therefore, performance degradation under these conditions stems from inherent limitations common to the tracking domain rather than from sparsification or motion-aware strategies.
 
  \begin{figure}[h]
 % \vskip -0.4in

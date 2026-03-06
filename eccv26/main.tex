@@ -43,9 +43,9 @@
 %  should be clear).
 
 % TODO FINAL: Comment out the following line for the camera-ready version
-%\usepackage[pagebackref,breaklinks,colorlinks,citecolor=eccvblue]{hyperref}
+\usepackage[pagebackref,breaklinks,colorlinks,citecolor=eccvblue]{hyperref}
 % TODO FINAL: Un-comment the following line for the camera-ready version
-\usepackage{hyperref}
+% \usepackage{hyperref}
 
 % Support for ORCID icon
 \usepackage{orcidlink}
@@ -90,13 +90,13 @@ ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
 \input{2_related_works.tex}
 
 \begin{figure*}[t]
-\vskip 0.2in
+% \vskip 0.2in
 \begin{center}
 \centerline{\includegraphics[width=\textwidth]{imgs/main_frame.pdf}}
-\caption{Overview of our motion-aware token sparsification framework. Given a template and a search region, we insert a sparsification module into the Transformer encoder to retain the top-$K$ search tokens for subsequent computation. The token selection is guided by attention-based relevance together with a temporal motion prior from the previous prediction, enabling early pruning while preserving target-relevant information. The resulting sparse tokens are then decoded by a lightweight MLP-based sparse head that operates directly on the unstructured token set with a score-first, regress-once pipeline, avoiding dense reshaping and reducing redundant prediction computation.}
+\caption{Overview of the MaST framework. The General Sparsification Module is inserted \emph{once} at an early encoder layer, retaining the top-$K$ search tokens; all subsequent Transformer blocks operate on this reduced set. Token selection fuses cross-attention relevance with a motion prior from the previous prediction for early and stable pruning. The retained sparse tokens are then decoded by a lightweight MLP sparse head with a score-first, regress-once pipeline, eliminating dense reshaping and redundant computation.}
 \label{main_frame}
 \end{center}
-\vskip -0.2in
+\vskip -0.3in
 \end{figure*}
 
 
@@ -105,7 +105,7 @@ ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
 
 
 \section{Conclusion}
-In this work, we demonstrated the effectiveness of motion-aware token sparsification for efficient visual tracking, making it suitable for real-time applications. However, one limitation of our approach lies in the reduced receptive field compared to methods that perform dense computation over the entire local search region. We hope our experiments inspire more research on temporal motion priors for lightweight and accurate tracking.
+In this work, we present MaST, a sparse tracker that unifies motion-aware early token pruning with a natively sparse prediction head. Unlike prior methods that defer pruning to intermediate layers, a motion prior enables reliable one-shot reduction at the first encoder layer, letting all subsequent Transformer blocks operate on the compressed token set. A score-first, regress-once head decodes targets directly from retained tokens, eliminating dense reshape and redundant regression. Together, these designs achieve Pareto-optimal speed--accuracy trade-offs on edge platforms, showing that end-to-end sparsity is a practical path to real-time tracking. A remaining limitation is that high-resolution inputs still incur substantial attention computation before sparsification takes effect, motivating input-adaptive pruning as future work.
 
 % \par\vfill\par
 % Now we have reached the maximum length of an ECCV \ECCVyear{} submission (excluding references and acknowledgements).
@@ -124,6 +124,6 @@ In this work, we demonstrated the effectiveness of motion-aware token sparsifica
 \bibliography{main}
 \clearpage
 
-\input{A_supplementary.tex}
+% \input{A_supplementary.tex}
 
 \end{document}

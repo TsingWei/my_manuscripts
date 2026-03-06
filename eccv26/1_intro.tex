@@ -5,8 +5,8 @@
   \centering
   \includegraphics[width=\linewidth]{imgs/title_vs.pdf}
   \caption{\textbf{Speed–accuracy trade-off on edge platforms.}
-  Left: TrackingNet SUC vs.\ Orin Nano speed (FPS).
-  Right: LaSOT AUC vs.\ Raspberry Pi speed (FPS).
+  The left panel shows TrackingNet SUC vs.\ Orin Nano speed (FPS).
+  The right panel shows LaSOT AUC vs.\ CPU speed (FPS).
   Bubble area is proportional to model parameter count.
   Our MaST-\{small, tiny, nano\} achieve Pareto-optimal trade-offs,
   delivering competitive or superior accuracy at significantly higher
@@ -30,8 +30,8 @@ interactions through self-attention.
 However, their quadratic attention complexity over long token sequences
 incurs substantial computational cost, hindering deployment on
 resource-constrained platforms such as UAVs and mobile robots.
-The field has pursued two lines of work to improve efficiency:
-lightweight architectures~\cite{HiT,lighttrack,fear} that employ
+The field has pursued two lines of work to improve efficiency,
+including lightweight architectures~\cite{HiT,lighttrack,fear} that employ
 scaled-down backbones at the expense of discriminative power,
 and adaptive computation methods~\cite{AVTrack,wu2024learning,abavitrack}
 that reduce average latency but leave the worst-case computational
@@ -44,7 +44,7 @@ dynamic token reduction — a strategy proven effective in general
 vision tasks~\cite{evit,bolya2022tome}.
 This makes token sparsification a particularly promising avenue for
 accelerating Transformer-based trackers.
-Several recent works have explored this direction:
+Several recent works have explored this direction.
 OSTrack~\cite{ostrack} repurposes the cross-attention scores between
 search and template tokens as a pruning criterion, retaining a fixed
 ratio of search tokens at intermediate encoder layers;
@@ -75,7 +75,7 @@ per-token importance for early dropping decisions.
 % === P4: Limitations + left figure ===
 Despite these advances, existing token sparsification approaches for
 tracking still face systematic limitations. On the token-reduction side,
-pruning is typically applied too late: as illustrated in~\figref{fig:motivation}(a),
+pruning is typically applied too late, as illustrated in~\figref{fig:motivation}(a),
 early-layer attention maps are highly diffuse, making attention-based
 importance scores unreliable and forcing most methods to defer pruning
 to intermediate layers (e.g., progressively at the 4rd, 7th, 11th),
@@ -85,14 +85,14 @@ auxiliary predictors) capture only appearance-level relevance within the
 current frame and ignore the strong temporal motion continuity in
 tracking, i.e., the prior knowledge of where the target was in the
 previous frame. On the output side, the prediction
-head remains a dense bottleneck: convolutional heads assume a dense,
+head remains a dense bottleneck. Convolutional heads assume a dense,
 spatially structured token grid, so aggressive sparsification requires
 padding and reshaping sparse tokens back to a full 2D feature map,
 wasting computation on empty positions; at high compression ratios, the
 target-center token may even be pruned, leading to severe
 mislocalization. This mismatch between a sparse backbone and a dense
 head caps the achievable speedup and degrades accuracy. Notably, the
-decoding head is not necessarily convolutional in modern trackers: some
+decoding head is not necessarily convolutional in modern trackers, and some
 methods decode targets via additional learnable tokens (e.g.,
 MixFormerV2~\cite{mixformerv2} and the ARTrack series~\cite{artrack,wang2026fartrack}),
 and LoRAT~\cite{lin2024loratrack} replaces the convolutional head
@@ -101,8 +101,8 @@ under dense token/feature assumptions, and their behavior under
 aggressive token sparsification remains under-explored.
 
 % === P5: Key insight + right figure (the pivot paragraph) ===
-A natural question arises: is early-layer pruning inherently
-harmful, or does it merely lack the right guidance?
+A natural question arises as to whether early-layer pruning is inherently
+harmful, or whether it merely lacks the right guidance.
 To answer this, we conduct a diagnostic experiment that disentangles
 the effect of when to prune from what to prune.
 As shown in~\figref{fig:motivation}(b), when token selection at
@@ -114,8 +114,8 @@ This result indicates that the performance degradation associated with
 early pruning stems not from insufficient token representations, but
 from the inability to identify the correct tokens to retain at that
 stage.
-The challenge therefore reduces to two sub-problems:
-(i)~obtaining a reliable spatial prior for token selection
+The challenge therefore reduces to two sub-problems,
+(i)~obtaining a reliable motion prior for token selection
 before the encoder has produced discriminative features, and
 (ii)~designing a prediction head that natively operates on the
 resulting sparse, unstructured token set.
@@ -137,7 +137,7 @@ reshape and reducing redundant computation.
 
 
 % === P8: Contributions ===
-Our main contributions are summarized as follows:
+Our main contributions are summarized as follows.
 \begin{itemize}
   \item We propose MaST, a sparse tracking framework that performs early,
         task-driven token reduction in the search region using temporal
