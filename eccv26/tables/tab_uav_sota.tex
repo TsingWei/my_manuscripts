@@ -1,0 +1,37 @@
+\begin{table*}[t]
+    \centering
+    \caption{State-of-the-art comparison on three UAV-oriented tracking benchmarks.
+        Methods above the double rule are traditional correlation-filter trackers; those below are deep trackers.
+        \rankfirst{Red} and \ranksecond{blue} indicate the best and second-best results overall.}
+    \label{tab:uav-sota}
+    \resizebox{\linewidth}{!}{
+        \renewcommand{\arraystretch}{1.2}
+        \begin{tabular}{l |c | c c | c c | c c | c c | c c}
+            \toprule
+            \multirow{2}*{Method}                     & \multirow{2}*{Pub.} &
+            \multicolumn{2}{c|}{DTB70}                &
+            \multicolumn{2}{c|}{UAVDT}                &
+            \multicolumn{2}{c|}{UAV123}               &
+            \multirow{2}*{\shortstack{Param.                                                                                                                                                                                    \\(M)}} &
+            \multirow{2}*{\shortstack{MACs                                                                                                                                                                                      \\(G)}} &
+            \multicolumn{2}{c}{FPS}                                                                                                                                                                                             \\
+            \cline{3-8}\cline{11-12}
+                                                      &                     & SUC               & P                 & SUC               & P                & SUC               & P                 &      &       & RPi  & Nano \\
+            \midrule[0.5pt]
+
+            HiFT~\cite{HiFT}                          & ICCV'21             & 59.4              & 80.2              & 47.5              & 65.2             & 59.0              & 78.7              & 15.9  & 5.48   & 5.5  & 57   \\
+            TCTrack~\cite{TCTrack}                    & CVPR'22             & 62.2              & 81.2              & 53.0              & 72.5             & 60.5              & 80.0              & 9.7  & 8.8   & -    & -    \\
+            SGDViT~\cite{SGDViT}                      & ICRA'23             & 60.4              & 78.5              & 48.0              & 65.7             & 57.5              & 75.4              & 23.3 & 11.3  & -    & -    \\
+            Aba-ViTrack-DeiT~\cite{abavitrack}             & ICCV'23             & \rankfirst{66.4}  & \ranksecond{85.9} & 59.9              & 83.4             & 66.4              & \ranksecond{86.4} & 7.98  & 2.39   & 7.9    & 83    \\
+            SMAT~\cite{SMAT}                          & WACV'24             & 63.8              & 81.9              & 58.7              & 80.8             & 64.6              & 81.8              & 3.76  & 2.49   & 7.7  & 77    \\
+            AVTrack-DeiT~\cite{AVTrack}               & ICML'24             & 65.0              & 84.3              & 58.7              & 82.1             & \rankfirst{66.8}  & 84.8              & 7.98  & 2.39   & 7.9 &  83  \\
+            ORTrack-DeiT~\cite{wu2025ortrack}         & CVPR'25             & \rankfirst{66.4}  & \rankfirst{86.2}  & \ranksecond{60.1} & 83.4             & 66.4              & 84.3              & 7.98  & 2.39   & 7.9  & 84   \\
+            ORTrack-D-DeiT~\cite{wu2025ortrack}       & CVPR'25             & 65.1              & 83.7              & 59.7              & 82.5             & 66.1              & 84.0              & 5.31  & 1.54   & 18.5 & 138  \\
+            \midrule[0.5pt]
+            \rowcolor[gray]{0.92} \textbf{MaST-nano}  & Ours                & 61.8              & 79.9              & 55.1              & 75.3             & 62.9              & 82.4              & 3.85 & 0.585 & 30.1 & 230  \\
+            \rowcolor[gray]{0.92} \textbf{MaST-tiny}  & Ours                & 63.3              & 81.9              & 57.5              & 77.8             & \ranksecond{66.6} & \rankfirst{86.9}  & 5.63 & 0.836 & 22.6 & 152  \\
+            \rowcolor[gray]{0.92} \textbf{MaST-small} & Ours                & \ranksecond{66.2} & 85.6              & \rankfirst{63.0}  & \rankfirst{85.9} & 66.4              & 86.2              & 5.63 & 1.82  & 7.5  & 98   \\
+            \bottomrule
+        \end{tabular}
+    }
+\end{table*}

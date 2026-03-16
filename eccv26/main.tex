@@ -5,9 +5,9 @@
  
 % TODO REVIEW: Insert your submission number below by replacing '*****'
 % TODO FINAL: Comment out the following line for the camera-ready version
-\usepackage[review,year=2026,ID=12428]{eccv}
+% \usepackage[review,year=2026,ID=12428]{eccv}
 % TODO FINAL: Un-comment the following line for the camera-ready version
-%\usepackage{eccv}
+\usepackage{eccv}
 
 % OPTIONAL: Un-comment the following line for a version which is easier to read
 % on small portrait-orientation screens (e.g., mobile phones, or beside other windows)
@@ -25,6 +25,7 @@
 \usepackage{booktabs}
 \usepackage{colortbl}
 \usepackage{wrapfig}
+% \usepackage{bibunits}
 
 % The "axessiblity" package can be found at: https://ctan.org/pkg/axessibility?lang=en
 \usepackage[accsupp]{axessibility}  % Improves PDF readability for those with disabilities.
@@ -43,9 +44,9 @@
 %  should be clear).
 
 % TODO FINAL: Comment out the following line for the camera-ready version
-\usepackage[pagebackref,breaklinks,colorlinks,citecolor=eccvblue]{hyperref}
+% \usepackage[pagebackref,breaklinks,colorlinks,citecolor=eccvblue]{hyperref}
 % TODO FINAL: Un-comment the following line for the camera-ready version
-% \usepackage{hyperref}
+\usepackage{hyperref}
 
 % Support for ORCID icon
 \usepackage{orcidlink}
@@ -60,26 +61,25 @@
 
 % TODO REVIEW: If the paper title is too long for the running head, you can set
 % an abbreviated paper title here. If not, comment out.
-\titlerunning{Abbreviated paper title}
+% \titlerunning{Abbreviated paper title}
 
 % TODO FINAL: Replace with your author list. 
 % Include the authors' OCRID for the camera-ready version, if at all possible.
-\author{First Author\inst{1}\orcidlink{0000-1111-2222-3333} \and
-Second Author\inst{2,3}\orcidlink{1111-2222-3333-4444} \and
-Third Author\inst{3}\orcidlink{2222--3333-4444-5555}}
+\author{Qingmao Wei\inst{1,2}\orcidlink{0000-0001-9982-3119} \and
+Fagui Liu\inst{2}\orcidlink{0000-0003-1135-4982} \and
+Dengke Zhang\inst{1}\orcidlink{0009-0001-2941-0084} \and
+Qingze He\inst{1}\orcidlink{0009-0005-0859-2770} \and
+Quan Tang\inst{2}\orcidlink{0000-0003-4011-6166}
+}
 
 % TODO FINAL: Replace with an abbreviated list of authors.
-\authorrunning{F.~Author et al.}
+\authorrunning{Q.~Wei et al.}
 % First names are abbreviated in the running head.
 % If there are more than two authors, 'et al.' is used.
 
 % TODO FINAL: Replace with your institution list.
-\institute{Princeton University, Princeton NJ 08544, USA \and
-Springer Heidelberg, Tiergartenstr.~17, 69121 Heidelberg, Germany
-\email{lncs@springer.com}\\
-\url{http://www.springer.com/gp/computer-science/lncs} \and
-ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
-\email{\{abc,lncs\}@uni-heidelberg.de}}
+\institute{South China University of Technology, Guangzhou, China \and
+Pengcheng Laboratory, Shenzhen, China}
 
 \maketitle
 
@@ -106,7 +106,9 @@ ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
 
 \section{Conclusion}
 In this work, we present MaST, a sparse tracker that unifies motion-aware early token pruning with a natively sparse prediction head. Unlike prior methods that defer pruning to intermediate layers, a motion prior enables reliable one-shot reduction at the first encoder layer, letting all subsequent Transformer blocks operate on the compressed token set. A score-first, regress-once head decodes targets directly from retained tokens, eliminating dense reshape and redundant regression. Together, these designs achieve Pareto-optimal speed--accuracy trade-offs on edge platforms, showing that end-to-end sparsity is a practical path to real-time tracking. A remaining limitation is that high-resolution inputs still incur substantial attention computation before sparsification takes effect, motivating input-adaptive pruning as future work.
-
+% \clearpage
+\bibliographystyle{splncs04}
+\bibliography{main}
 % \par\vfill\par
 % Now we have reached the maximum length of an ECCV \ECCVyear{} submission (excluding references and acknowledgements).
 % References should start immediately after the main text, but can continue past p.\ 14 if needed. 
@@ -120,8 +122,8 @@ In this work, we present MaST, a sparse tracker that unifies motion-aware early 
 % BibTeX users should specify bibliography style 'splncs04'.
 % References will then be sorted and formatted in the correct style.
 %
-\bibliographystyle{splncs04}
-\bibliography{main}
+\input{A_supplementary.tex}
+
 \clearpage
 
 % \input{A_supplementary.tex}

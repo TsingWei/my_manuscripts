@@ -2,6 +2,9 @@ Method,Seires,M4_fps,GFLOPs,LaSOT,OrinGPU,OrinCPU,TkNet
 MaST-nano,Ours,100,0.612,58.6,230.0,40.3,77.2
 MaST-tiny,Ours,72,0.862,63.8,152.0,29.6,80.1
 MaST-small,Ours,28,1.940,65.7,84.0,14.3,82.3
+FARTrack-pico,FARTrack,35.3,1.08,58.6,134.9,31.7,75.6
+FARTrack-tiny,FARTrack,25.6,1.78,61.3,117.3,19.8,79.1
+FARTrack-small,FARTrack,16.1,2.65,63.2,87.1,13.4,80.7
 AsymTrack-T,AsymTrack,59,0.700,60.8,99.0,21.2,76.2
 AsymTrack-S,AsymTrack,51,0.800,62.8,88.0,11.2,77.9
 AsymTrack-B,AsymTrack,25,1.800,64.7,57.0,9.8,80.0

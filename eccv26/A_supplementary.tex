@@ -5,57 +5,92 @@
 
 
 
-\subsection{Per-Atrribute Analysis.}
-The radar chart in \figref{radar} shows that 30\% tokens with a motion window (blue) achieve performance close to 100\% tokens (red) across most attributes, especially in fast motion and occlusion scenarios. In contrast, 30\% tokens without a motion window (cyan) exhibit notable drops in attributes like out-of-view and background clutter. The decline in background clutter performance may stem from the model's insufficient discriminative capability, leading to the predicted bounding box drifting toward similar objects. When this inaccurate prediction is used to generate the motion window, it restricts the search area, further limiting the model's ability to recover the target in cluttered backgrounds. This shows the need for stronger discriminative features to complement sparsification strategies.
+\subsection{Training Details.}
 
- \begin{figure}[h]
-% \vskip -0.4in
-\begin{center}
-\centerline{\includegraphics[width=0.7\columnwidth]{imgs/radar_plot.png}}
-\caption{Per-attribute performance comparison using a radar chart. Results are shown for three setups, namely 100\% tokens, 30\% tokens with motion window, and 30\% tokens without motion window. The motion window significantly improves performance in challenging scenarios like fast motion, occlusion, and out-of-view cases.}
-\label{radar}
-\end{center}
-% \vskip -0.4in
-\end{figure}
+\textbf{Model Inputs.}
+The tracker takes a pair of cropped images as input: a template patch $Z$ and a search region patch $X$, both divided into non-overlapping $16 \times 16$ patches.
+Input sizes differ across model variants (see~\tabref{tab:model-card}): MaST-nano and MaST-tiny use a template of $128 \times 128$ and a search region of $256 \times 256$, yielding $64$ template tokens and $256$ search tokens; MaST-small uses a larger template of $192 \times 192$ and a search region of $384 \times 384$, yielding $144$ template tokens and $576$ search tokens.
+The backbone is initialized with MAE-lite~\cite{wang2023maelite} pre-trained weights.
 
-\subsection{Analysis of Motion Window.}
-\tabref{tab:windowing} presents an ablation study of various windowing strategies used in the proposed framework. We compare two window types (Gaussian and Cosine), evaluate the effect of incorporating cross-attention importance scores, and analyze whether dynamic window resizing (based on the width and height of the previous frame’s bounding box) improves performance. Results show that combining importance scores with a Gaussian window achieves the best overall performance. The fiexd windowing approach yields sub-optimal perfrmance compared to dynamic window sizes. The last two rows highlight that using only motion windows for sparsification performs better than using only cross-attention scores, but their combination consistently outperforms either individually. This confirms that both the spatial prior and cross-attention scores are crucial for effective token selection.
-This conclusion is further supported by \figref{abl_vs}, where the orange solid line (Gaussian with motion windows) achieves superior AUC across different token retention rates compared to the dashed orange line (without motion windows). The motion window effectively enhances the selection of relevant tokens, particularly at lower retention rates (e.g., 30\% and 20\%), where its use maintains accuracy while achieving higher FPS. This demonstrates the importance of combi`ning spatial priors from motion windows with cross-attention scores to optimize tracking performance and efficiency.
+\textbf{Augmentation.}
+Each training sample is constructed as a template–search image pair sampled from the same video sequence.
+Standard data augmentations are applied, including random horizontal flipping and brightness jittering.
+The batch size is set to 128 image pairs.
+
+\textbf{Training Pipeline.}
+Training proceeds in two stages.
+In \textbf{Stage 1}, we train a dense base model (no token sparsification) using the full ViT-Tiny backbone at $128\times128$ template and $256\times256$ search resolution.
+We use the AdamW optimizer~\cite{adamw} with a weight decay of $10^{-4}$, a backbone learning rate of $4 \times 10^{-5}$, and $4 \times 10^{-4}$ for all other parameters.
+Training runs for 300 epochs with 60{,}000 image pairs per epoch; the learning rate is decayed by a factor of 10 after epoch 240.
+This stage produces a single well-converged dense checkpoint shared by all variants.
+
+In \textbf{Stage 2}, we fine-tune three variants from this checkpoint for 50 epochs each with sparsification enabled:
+\begin{itemize}
+  \item \textbf{MaST-tiny}: fine-tuned directly from the Stage 1 checkpoint at the same $128/256$ resolution.
+  \item \textbf{MaST-small}: the position encodings are bilinearly interpolated to accommodate the larger $192\times192$ template and $384\times384$ search resolution, then fine-tuned.
+  \item \textbf{MaST-nano}: the last 4 encoder layers are removed and the remaining 8-layer backbone is fine-tuned at $128/256$ resolution.
+\end{itemize}
+
+\textbf{Sparsification Warmup.}
+Across all Stage 2 variants, token sparsification is introduced with a gradual warmup.
+Starting from epoch 1, the token retention rate is linearly annealed from $100\%$ down to the target rate (30\% for all variants) over the first 10 epochs, and then held constant for the remainder of Stage 2 fine-tuning.
+
+\textbf{Motion Prior During Training.}
+At test time, the motion window is centered on the bounding box predicted in the previous frame.
+During training, the search region is cropped with a random spatial jitter around the ground-truth target location, so the target is approximately centered in the search patch.
+We therefore simply set the motion window center to the center of the search image, which naturally approximates the previous-frame prediction without requiring any additional placeholder or annotation.
+The motion window is enabled throughout Stage 2 (including during the sparsification warmup epochs).
+
+
+% \subsection{Per-Atrribute Analysis.}
+% The radar chart in \figref{radar} shows that 30\% tokens with a motion window (blue) achieve performance close to 100\% tokens (red) across most attributes, especially in fast motion and occlusion scenarios. In contrast, 30\% tokens without a motion window (cyan) show notable drops in out-of-view and background clutter. The background clutter drop likely stems from insufficient discrimination: the bounding box drifts toward visually similar objects. This inaccurate prediction then restricts the motion window, further limiting recovery in cluttered backgrounds. Stronger discriminative features are needed to complement the sparsification strategy.
+
+%  \begin{figure}[h]
+% % \vskip -0.4in
+% \begin{center}
+% \centerline{\includegraphics[width=0.7\columnwidth]{imgs/radar_plot.png}}
+% \caption{Per-attribute performance comparison using a radar chart. Results are shown for three setups, namely 100\% tokens, 30\% tokens with motion window, and 30\% tokens without motion window. The motion window significantly improves performance in challenging scenarios like fast motion, occlusion, and out-of-view cases.}
+% \label{radar}
+% \end{center}
+% % \vskip -0.4in
+% \end{figure}
 
 \input{tables/tab_window}
+\subsection{Analysis of Motion Window.}
+\tabref{tab:windowing} presents an ablation study of various windowing strategies used in the proposed framework. We compare two window types (Gaussian and Cosine), evaluate the effect of incorporating cross-attention importance scores, and analyze whether dynamic window resizing (based on the width and height of the previous frame’s bounding box) improves performance. Results show that combining importance scores with a Gaussian window achieves the best overall performance. The fiexd windowing approach yields sub-optimal perfrmance compared to dynamic window sizes. The last two rows highlight that using only motion windows for sparsification performs better than using only cross-attention scores, but their combination consistently outperforms either individually. This confirms that both the spatial prior and cross-attention scores are crucial for effective token selection.
 
-\subsection{Scaling to Larger Models}
-Experiments shown in ~\tabref{tab:scaling} examine the scalability of our motion-aware sparsification by applying it to a slightly larger ViT-Base model(LoRAT~\cite{lin2024loratrack}) and increasing the input resolution from 256×256 to 384×384. This experiment demonstrates the generalizability of our approach to larger models.
+
 
 \input{tables/tab_larger}
+\subsection{Scaling to Larger Models}
+Experiments shown in ~\tabref{tab:scaling} examine the scalability of our motion-aware sparsification by applying it to a slightly larger ViT-Base model(LoRAT~\cite{lin2024loratrack}) and increasing the input resolution from 224×224 to 378×378. This experiment demonstrates the generalizability of our approach to larger models.
 
 
+
+\input{tables/tab_uav_sota.tex}
+\subsection{Comparison on UAV Benchmarks.}
+\tabref{tab:uav-sota} provides a comprehensive comparison on three UAV-specific benchmarks.
+On UAVDT~\cite{uavdt}, MaST-small achieves the highest success (63.0) and precision (85.9), surpassing ORTrack-DeiT (60.1 / 83.4) by +2.9 / +2.5 while consuming only $1.82$~G MACs versus $2.39$~G; on Jetson Orin Nano, MaST-small also runs faster at 98~FPS versus 84~FPS.
+On UAV123~\cite{uav123}, MaST-tiny attains the highest precision of 86.9, outperforming Aba-ViTrack-DeiT (86.4) and AVTrack-DeiT (84.8). It also achieves the second-highest success of 66.6, all with only 0.836~G MACs. On edge devices, MaST-tiny runs at 22.6~FPS on Raspberry Pi~5 and 152~FPS on Jetson Orin Nano.
+On {DTB70}~\cite{dtb70}, MaST-small achieves the second-highest success of 66.2 (behind the 66.4 shared by Aba-ViTrack-DeiT and ORTrack-DeiT) and a precision of 85.6, demonstrating competitive accuracy on this challenging aerial benchmark.
+MaST-nano is the lightest variant at 0.585~G MACs. It achieves 30.1~FPS on RPi5 and 230~FPS on Jetson Nano, the highest edge throughput among all compared methods, while maintaining solid accuracy across all three benchmarks.
+These results confirm that MaST's motion-aware sparse computation transfers favorably to UAV deployment scenarios, delivering a strong accuracy--efficiency trade-off on both general and edge hardware.
+
+\input{tables/tab_allr_fps.tex}
 \subsection{Running Latency on More Platforms.}
-Our primary focus is on real-world deployment scenarios, particularly on edge devices, where power consumption and thermal constraints are critical factors. High-power GPUs, while useful for benchmarking, are often impractical for real-world applications in embedded and mobile settings.  \tabref{tab:fps_more} reports the inference speed (in FPS) and accuracy (LaSOT AUC) of several tracking methods across four representative hardware platforms. The benchmark shows that MaST still get a better trade-off between accuracy and speed even on powerful devices.
+Our primary focus is on real-world deployment, particularly on edge devices where power consumption and thermal constraints are critical. High-power GPUs and desktop CPUs are convenient for offline benchmarking but rarely represent embedded or mobile deployment conditions.
+Critically, \emph{high throughput on powerful hardware does not imply efficiency on low-power devices}.
+Server-grade GPUs and desktop CPUs have large L2/L3 caches and abundant on-chip SRAM. These resources hide irregular memory-access latency and keep arithmetic units saturated. Edge platforms such as Raspberry Pi 5 and Jetson Orin Nano have no such buffer. Their small caches and limited memory bandwidth penalize operations that are cache-friendly on high-end hardware but bandwidth-bound on constrained devices.
+This disparity is evident in~\tabref{tab-sota-fps}. CompressTracker reaches 605~FPS on an RTX~3090 but only 3.9~FPS on Raspberry Pi~5, well below the VOT realtime threshold. LiteTrack-B4 similarly reaches 376~FPS on GPU but drops to 3.6~FPS on-device. MaST avoids dense operations that scale poorly on cache-limited hardware. MaST-nano and MaST-tiny sustain 30.1 and 22.6~FPS on Raspberry Pi~5 respectively, while remaining competitive or superior in accuracy.
 
-\begin{table}[ht]
-    \centering
-    \caption{Comparison of tracking speed (FPS) for different methods on various hardware platforms, including NVIDIA 2080Ti GPU, Intel i7-13700 CPU, intel N100, and Raspberry Pi 5 (RPi-5). LaSOT AUC is reported as a measure of accuracy.}
-    \resizebox{0.65\linewidth}{!}{
-        \begin{tabular}{c|c|cccc}
-            \toprule
-            Method& LaSOT AUC& 2080Ti & i7-13700 & N100 & RPi-5 \\
-            \midrule[0.5pt]
-            MaST-tiny                       & 63.3  & 453    & 184      & 48.3 & 22.6  \\
-MaST-nano                       & 58.6  & 511    & 205      & 64.5 & 30.1  \\
-HiT-T                           & 59.1  & 355    & 176      & 53.3 & 27.3  \\
-HiT-S                           & 60.5  & 309    & 144      & 43.5 & 21.5  \\
-LightTrack                      & 53.8  & 444    & 136      & 60.2 & 13.4  \\
-AVTrack                         & 64.1  & 274    & 78       & 17.3 & 7.7       \\
-            % \hline
-            % Gaussian       & \checkmark                & 25\%                 & 68.2              & 75.4   \\
-            % Cosine         & \checkmark                & 25\%                 & 67.9              & 76.8   \\
-            % -           & \checkmark                & 25\%                 & 65.8              & 80.5   \\
-            % Gaussian       & -                & 25\%                 & 62.3              & 82.9   \\ 
-            \bottomrule
-        \end{tabular}}
-    \label{tab:fps_more}
-\end{table}
+
+
+\subsection{NFS under Different Input Frame Rates.}
+\tabref{tab:nfs-framerate} compares MaST-tiny with OSTrack-Tiny under the 30~FPS and 240~FPS evaluation protocols on NFS. At 30~\textit{fps}, MaST-tiny already outperforms OSTrack-Tiny by +1.1 AUC, +0.6 P$_{Norm}$, and +0.3 P. At 240~\textit{fps}, the margin widens to +2.9 AUC, +4.0 P$_{Norm}$, and +4.0 P. Higher frame rates yield smaller inter-frame displacement and a clearer motion prior, allowing MaST to guide token selection more accurately than appearance-only methods.
+
+The comparison also highlights the importance of tracker latency. From 30 to 240~\textit{fps}, OSTrack-Tiny improves only marginally (+0.7 AUC), while MaST-tiny gains +2.5 AUC. A motion-aware tracker can better exploit improved temporal continuity when its inference latency is low. MaST-tiny runs at 152~FPS on Jetson Nano versus 83~FPS for OSTrack-Tiny, making high-frame-rate online tracking more practical in real deployments.
+
+\input{tables/tab_nfs_framerate}
 
 
 \subsection{More Visualizations.}
@@ -82,6 +117,9 @@ AVTrack                         & 64.1  & 274    & 78       & 17.3 & 7.7       \
 \end{figure}
 
 \subsection{Limitations.}
-One limitation of our approach lies in the reduced "receptive field" compared to methods that perform dense computation over the entire local search region. By focusing on a smaller set of motion-guided tokens, the model may miss targets that move abruptly or unpredictably outside the attended area. This issue becomes more pronounced if the underlying model lacks sufficient accuracy, or if the input frame rate is too low—leading to poor motion continuity and large inter-frame displacements. In such scenarios, the tracker may fail to recover the target, resulting in decreased performance. Future work may explore adaptive mechanisms to dynamically adjust the search area or incorporate long-term cues to address these challenges.
+MaST inherits the local search region paradigm that is standard across modern one-stream and two-stream trackers.
+This design choice means that target loss under fast motion or prolonged occlusion remains an inherent challenge shared with the broader tracking community, rather than a problem introduced by our motion-aware sparsification.
+When the inter-frame displacement exceeds the search region radius, or when the target is occluded for an extended period, the tracker cannot relocate the target beyond the local window. This holds regardless of how tokens are selected within it.
+Looking forward, we see motion-aware sparse computation itself as a promising tool to address this limitation: by concentrating computation on a small set of informative tokens, the saved budget could be redistributed to extend the effective search area or to maintain a lightweight global context stream, enabling wider spatial coverage without increasing the overall computational cost.
 
 \clearpage

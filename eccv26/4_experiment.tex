@@ -14,10 +14,6 @@ To ensure a consistent evaluation environment and better reflect real-world appl
 To demonstrate our method on the low-cost edge device, we use ViT-Tiny~\cite{vit} as the encoder and the training are initialized with the MAE-lite~\cite{wang2023maelite}.
 We provide three model variants with different backbones, encoder depths, and token retention rates, as summarized in~\tabref{tab:model-card}.
 MaST-nano uses the first 8 layers of ViT-Tiny with a 20\% retention rate for maximum efficiency; MaST-tiny employs the full 12-layer ViT-Tiny with 30\% retention; MaST-small scales to ViT-Small with 30\% retention for higher accuracy.
-% We provide the 30\% tokens retraining model as MaST-tiny, and a lighter model that only using first 8 layers as MaST-nano, to show the compatibility of our method with layer pruning.  More results with various token retention rates can be seen in ablation studies.
-
-
-
 
 
 \textbf{Training.} 
@@ -36,7 +32,7 @@ The training splits of COCO~\cite{coco}, LaSOT~\cite{lasot}, GOT-10k~\cite{got10
   \end{minipage}
 \end{table*}
 \subsection{Comparison with State-of-the-arts}
-We conduct a comprehensive comparison on five widely used tracking benchmarks. Trackers are grouped into three tiers, namely $\sim$500M, $\sim$1G, and $\sim$2G MACs---based on their computational cost, and compared within the same tier.
+We conduct a comprehensive comparison on five widely used tracking benchmarks. Trackers are grouped into three tiers, namely $\sim$500M, $\sim$1G, and $\sim$2G MACs, based on their computational cost, and compared within the same tier.
 
 \textbf{LaSOT.} LaSOT~\cite{lasot} is a large-scale long-term tracking benchmark comprising 1,400 video sequences with 280 sequences reserved for testing. As shown in~\tabref{tab-sota-efficient}, MaST-tiny achieves the highest AUC of 63.8 and $P_{Norm}$ of 72.2 in the $\sim$1G group, outperforming AsymTrack-S~\cite{zhu2025asymtrack} by +1.0 AUC and HiT-Small~\cite{HiT} by +3.3 AUC, while running at 22.6 FPS on Raspberry Pi 5. MaST-small further pushes to 65.8 AUC in the $\sim$2G group, surpassing FERMT~\cite{fermt} by +0.7 AUC.
 
@@ -45,7 +41,7 @@ We conduct a comprehensive comparison on five widely used tracking benchmarks. T
 \textbf{GOT-10k.} GOT-10k~\cite{got10k} is a large-scale dataset with 180 test sequences featuring non-overlapping object categories between train and test splits, designed to measure generalization. MaST-tiny attains an AO of 66.6 and $\text{SR}_{0.75}$ of 62.5 in the $\sim$1G group, outperforming AsymTrack-S by +1.1 AO and +3.6 $\text{SR}_{0.75}$. MaST-small achieves 70.0 AO and the highest $\text{SR}_{0.75}$ of 67.0 in the $\sim$2G group.
 
 
-\textbf{LaSOT$_{\text{ext}}$.} LaSOT$_{\text{ext}}$~\cite{lasot} extends LaSOT with 150 test sequences covering more diverse and challenging long-term scenarios. As reported in~\tabref{tab:more-benchmarks}, MaST-small achieves the highest AUC of 45.3, surpassing FARTrack$_\text{tiny}$~\cite{wang2026fartrack} by +0.3 and AsymTrack-B~\cite{zhu2025asymtrack} by +0.7. MaST-tiny achieves 42.8 AUC at 22.6 FPS on Raspberry Pi 5---over $3{\times}$ faster than AsymTrack-B (6.2 FPS)---offering a favorable speed--accuracy trade-off for long-term tracking.
+\textbf{LaSOT$_{\text{ext}}$.} LaSOT$_{\text{ext}}$~\cite{lasot} extends LaSOT with 150 test sequences covering more diverse and challenging long-term scenarios. As reported in~\tabref{tab:more-benchmarks}, MaST-small achieves the highest AUC of 45.3, surpassing FARTrack$_\text{tiny}$~\cite{wang2026fartrack} by +0.3 and AsymTrack-B~\cite{zhu2025asymtrack} by +0.7. MaST-tiny achieves 42.8 AUC at 22.6 FPS on Raspberry Pi 5, over $3{\times}$ faster than AsymTrack-B (6.2 FPS) ,offering a favorable speed--accuracy trade-off for long-term tracking.
 
 \textbf{UAV123.} UAV123~\cite{uav123} is an aerial tracking benchmark with 123 low-altitude UAV sequences featuring fast motion, small targets, and frequent occlusion. MaST-tiny achieves the highest AUC of 66.6 among all compared methods, outperforming LiteTrack-B4~\cite{LiteTrack} (66.4) and AsymTrack-B~\cite{zhu2025asymtrack} (66.5) while running at 22.6 FPS on Raspberry Pi 5. MaST-nano attains 62.9 AUC at a leading 30.1 FPS, making it well-suited for resource-constrained aerial applications.
 
@@ -53,12 +49,8 @@ We conduct a comprehensive comparison on five widely used tracking benchmarks. T
 
 \textbf{VastTrack.} VastTrack~\cite{peng2024vasttrack} is a large-vocabulary benchmark spanning 2,115 object categories with over 50,000 sequences, designed to evaluate tracking generalization across a vast range of target types. As shown in~\tabref{tab:vast}, MaST-small achieves a SUC of 35.6 and P$_{Norm}$ of 43.2, surpassing heavier MixFormerV2-B~\cite{mixformerv2}(35.2 SUC) by +0.4. The P$_{Norm}$ advantage is particularly striking at $+6.7$ over the next-best method, suggesting superior localization accuracy normalized by target scale. 
 
-% MaST-tiny also attains the second-highest P$_{Norm}$ of 40.7 among all methods, further demonstrating strong spatial precision across diverse object categories.
-
-
 
 \subsection{Ablation Study}
-% For efficient experiments, We train our model on GOT-10k train split and test on val split for ablation studies as default setting.
 
 \begin{table}[t]
   \input{tables/tab_token.tex}
@@ -91,33 +83,6 @@ We conduct a comprehensive comparison on five widely used tracking benchmarks. T
 \emph{Anchor-based} heads yield higher accuracy (63.8--64.1 AUC), yet the conventional 3$\times$3 Conv-stacked head must reshape sparse tokens back to a dense grid, incurring redundant computation and capping throughput at 13.8 FPS.
 Our sparse MLP head operates score-first, regress-once on retained tokens, improving throughput to 23.2 FPS with no accuracy loss over the dense MLP counterpart~\cite{lin2024loratrack} (63.8 AUC in both cases), confirming the value of a natively sparse head design.
 
-
-% \begin{figure}[h]
-% % \vskip 0.2in 
-% \begin{center}
-% \centerline{\includegraphics[width=0.9\columnwidth]{imgs/vs_window_plot.png}}
-% \caption{AUC vs. FPS trade-off on LaSOT with different sparsification strategies. The orange and blue curves compare the performance of motion windows with 1×1 and 3×3 convolution heads, respectively, at various token retention rates. The dashed line represents results without motion windows.}
-
-% \label{abl_vs}
-% \end{center}
-% % \vskip -0.2in
-% \end{figure}
-
-
-
-
-
-
-
-% \bigskip
-
-
-
-
-
-
-% \textbf{Analysis of Heads Under Various Sparse Rates.}
-% \figref{abl_vs} also examines the impact of 1×1 and 3×3 convolution heads on the efficiency of the sparsification framework when motion windows are applied. The results clearly show that the 1×1 convolution head (orange solid line) achieves significantly higher FPS compared to the 3×3 convolution head (blue solid line) at all token retention rates, while maintaining comparable AUC performance. For example, at a 30\% token retention rate, the 1×1 head achieves around 20 FPS, whereas the 3×3 head only reaches approximately 13 FPS. This is due to the reduced computational complexity of 1×1 convolutions, which makes them more suitable for sparse scenarios with fewer tokens. These findings highlight the efficiency advantage of 1×1 convolutions in real-time tracking tasks under computational constraints. 
 \begin{wrapfigure}{l}{0.3\textwidth}
     \centering
     % \vspace{-1.5em}
@@ -140,11 +105,9 @@ scale, confirming that MaST's accuracy–efficiency trade-off is robust across r
 
 \input{tables/tab_layer}
 \textbf{Layer-wise Sparsification Analysis.}
-\tabref{tab:layer} evaluates the effect of applying token sparsification at different layers (all with motion window) of the ViT-Tiny encoder. Under the motion prior, the choice of sparsification layer has only a negligible impact on accuracy: AUC varies by at most 0.4 points across all configurations. In contrast, the speed penalty of delaying sparsification is substantial---throughput nearly halves from 22.6 to 10.1 FPS when sparsification is pushed to later layers. Sparsifying at Layer 1 therefore offers the best cost-effectiveness, as it matches the accuracy of later-layer alternatives while delivering the highest throughput (22.6 FPS) and the lowest compute (836M FLOPs), and we adopt it as our default.
+\tabref{tab:layer} evaluates the effect of applying token sparsification at different layers (all with motion window) of the ViT-Tiny encoder. Under the motion prior, the choice of sparsification layer has only a negligible impact on accuracy: AUC varies by at most 0.4 points across all configurations. In contrast, the speed penalty of delaying sparsification is substantial, throughput nearly halves from 22.6 to 10.1 FPS when sparsification is pushed to later layers. Sparsifying at Layer 1 therefore offers the best cost-effectiveness, as it matches the accuracy of later-layer alternatives while delivering the highest throughput (22.6 FPS) and the lowest compute (836M FLOPs), and we adopt it as our default.
 
-% \textbf{Why the Sparse Head Enables Additional Speedup.}
-% \tabref{tab:speed} isolates the contribution of the prediction head to the overall speedup. Dense-compatible heads (e.g., 3$\times$3 conv, Loc Tokens, Transformer Decoder) must first reshape the sparse token set back to a full spatial grid before computation, so their head MACs are \emph{unchanged} by backbone sparsification. In contrast, our 1$\times$1 conv head and the MLP head operate natively on the retained tokens, reducing head MACs by ${\approx}3.4\times$ proportionally to the retention rate. This co-design of a sparse backbone with a natively sparse head is critical: it translates the $2.08\times$ backbone FLOPs reduction into a $\mathbf{2.08\times}$ overall FPS gain on edge devices.
-% \input{tables/tab_speed}
+
 
 \textbf{Comparison with Alternative Compression Strategies.}
 \tabref{tab:compress} compares MaST against three compression baselines under an identical compute budget ($\approx$1G MACs, ViT-Tiny backbone): the full dense model (1752M MACs), progressive token pruning from OSTrack~\cite{ostrack}, resolution reduction from LoReTrack~\cite{dong2024loretrack}, and layer pruning from CompressTracker~\cite{compressTracker}.

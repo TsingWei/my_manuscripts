@@ -1,0 +1,16 @@
+\begin{table}[ht]
+    \centering
+    \caption{Comparison on NFS\cite{nfs} under different input frame-rate settings. We compare MaST-tiny with OSTrack-Tiny under the standard 30 FPS and 240 FPS protocols. Higher input frame rates provide a more stable motion prior, while lower tracker latency improves the ability to exploit this temporal continuity in practice. Please fill in the numeric entries.}
+    \resizebox{0.7\linewidth}{!}{
+        \begin{tabular}{l|ccc|ccc|c}
+            \toprule
+            \multirow{2}{*}{Method} & \multicolumn{3}{c|}{@30 \textit{fps}} & \multicolumn{3}{c|}{@240 \textit{fps}} & Nano \\
+            % \cline{8-8}
+            & AUC & P$_{Norm}$ & P & AUC & P$_{Norm}$ & P & FPS \\
+            \midrule[0.5pt]
+            OSTrack-Tiny~\cite{ostrack} &65.1 & 81.2 & 78.4 & 65.8 & 81.3 & 78.5 & 83 \\
+            \textbf{MaST-tiny}          & 66.2 & 81.8 & 78.7 & 68.7 & 85.3 & 82.5 & 152 \\
+            \bottomrule
+        \end{tabular}}
+    \label{tab:nfs-framerate}
+\end{table}
